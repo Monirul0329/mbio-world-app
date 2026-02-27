@@ -3,66 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mBio World | Advance NEET Biology</title>
+    <title>mBio World | NEET Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div id="loader" class="hidden">Loading...</div>
 
     <div id="auth-section" class="auth-container">
         <div class="auth-card">
             <h1 class="logo">mBio World</h1>
             <div id="login-box">
-                <input type="email" id="email" placeholder="Email Address">
+                <input type="email" id="email" placeholder="Email">
                 <input type="password" id="password" placeholder="Password">
                 <button class="primary-btn" onclick="handleLogin()">Login</button>
-                <div class="auth-links">
-                    <span onclick="toggleAuth('reg')">New Student? Join</span>
-                    <span onclick="forgotPassword()">Forgot Password?</span>
-                </div>
+                <p class="toggle-text">New Student? <span onclick="toggleAuth('reg')">Register</span></p>
+                <p class="forgot" onclick="forgotPassword()">Forgot Password?</p>
             </div>
             <div id="reg-box" class="hidden">
                 <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="email" id="reg-email" placeholder="Email Address">
+                <input type="email" id="reg-email" placeholder="Email">
                 <input type="password" id="reg-password" placeholder="Set Password">
-                <button class="primary-btn" onclick="handleRegister()">Register as Student</button>
-                <span class="link" onclick="toggleAuth('login')">Back to Login</span>
+                <button class="primary-btn" onclick="handleRegister()">Join as Student</button>
+                <p class="toggle-text" onclick="toggleAuth('login')">Back to Login</p>
             </div>
         </div>
     </div>
 
     <div id="student-panel" class="hidden main-panel">
         <nav class="top-nav">
-            <span id="student-name">Welcome Student</span>
-            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            <span id="display-name">Student</span>
+            <button onclick="logout()">Logout</button>
         </nav>
-        <div class="content">
-            <div class="stats-row">
-                <div class="stat-box">Progress: <b id="prog">0%</b></div>
-                <div class="stat-box">Accuracy: <b id="acc">0%</b></div>
+        <div class="dashboard-grid">
+            <div class="menu-item" onclick="startQuiz()">
+                <i class="fas fa-play"></i>
+                <p>Start Quiz</p>
             </div>
-            <div class="grid-menu">
-                <div class="menu-card" onclick="showSection('ncert')"><i class="fas fa-book-open"></i> NCERT Library</div>
-                <div class="menu-card" onclick="startQuiz()"><i class="fas fa-clock"></i> Daily Challenge</div>
-                <div class="menu-card"><i class="fas fa-medal"></i> Leaderboard</div>
-                <div class="menu-card"><i class="fas fa-history"></i> My Analytics</div>
+            <div class="menu-item">
+                <i class="fas fa-book"></i>
+                <p>NCERT Library</p>
             </div>
-            <div id="quiz-area" class="hidden card">
-                <div class="timer-circle" id="timer">60s</div>
-                <img id="q-image" src="" alt="Question Image">
-                <div class="options">
-                    <button onclick="checkAns('A')">Option A</button>
-                    <button onclick="checkAns('B')">Option B</button>
-                    <button onclick="checkAns('C')">Option C</button>
-                    <button onclick="checkAns('D')">Option D</button>
+        </div>
+        <div id="quiz-area" class="hidden quiz-container">
+            <div class="timer" id="timer">60s</div>
+            <div id="q-content">
+                <img id="q-image" src="" style="width:100%; border-radius:10px;">
+                <div class="options-grid">
+                    <button onclick="checkAns('A')">A</button>
+                    <button onclick="checkAns('B')">B</button>
+                    <button onclick="checkAns('C')">C</button>
+                    <button onclick="checkAns('D')">D</button>
                 </div>
-                <p id="attempt-info">Attempt: 1/3 (60s)</p>
             </div>
         </div>
     </div>
@@ -70,23 +65,18 @@
     <div id="teacher-panel" class="hidden main-panel">
         <nav class="top-nav">
             <span>Teacher Console</span>
-            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            <button onclick="logout()">Logout</button>
         </nav>
-        <div class="content">
+        <div class="teacher-content">
             <div class="card">
-                <h3>Direct Upload Question (JPEG)</h3>
-                <input type="file" id="upload-file" accept="image/*">
-                <input type="text" id="correct-opt" placeholder="Correct Option (A/B/C/D)">
-                <button class="primary-btn" onclick="uploadToImgBB()">Direct Upload & Publish</button>
-            </div>
-            <div class="card">
-                <h3>Student Monitoring</h3>
-                <div id="student-list">Loading students...</div>
+                <h3>Upload Question</h3>
+                <input type="file" id="q-file">
+                <input type="text" id="q-ans" placeholder="Answer (A/B/C/D)">
+                <button onclick="uploadQuestion()">Upload & Publish</button>
             </div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
-    </html>
-    
+</html>
