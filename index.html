@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mBio World | NEET Biology</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-screen" class="container">
+        <div class="logo">
+            <h1>📱 mBio World</h1>
+            <p>Target: Only NEET Biology Students</p>
+        </div>
+        <div class="login-box">
+            <input type="email" id="login-email" placeholder="Email Address">
+            <input type="password" id="login-password" placeholder="Password">
+            <button id="btn-login" onclick="handleLogin()">Login to Dashboard</button>
+            <p id="auth-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <div id="student-dashboard" class="dashboard-container" style="display: none;">
+        <nav class="navbar">
+            <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+            <h2>Student Dashboard</h2>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </nav>
+
+        <div class="stats-grid">
+            <div class="stat-card">Total Completion: <span id="total-progress">0%</span></div>
+            <div class="stat-card">Accuracy: <span id="accuracy-graph">0%</span></div>
+        </div>
+
+        <div class="menu-grid">
+            <button class="menu-item"><i class="fas fa-book"></i> NCERT Reading</button>
+            <button class="menu-item"><i class="fas fa-brain"></i> Chapter-wise Quiz</button>
+            <button class="menu-item"><i class="fas fa-trophy"></i> Leaderboard</button>
+            <button class="menu-item"><i class="fas fa-bolt"></i> Daily Challenge</button>
+        </div>
+    </div>
+
+    <div id="teacher-dashboard" class="dashboard-container" style="display: none;">
+        <nav class="navbar">
+            <h2>👨‍🏫 Teacher Panel</h2>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </nav>
+
+        <div class="upload-section">
+            <h3>Upload New Question (JPEG)</h3>
+            <input type="file" id="q-image" accept="image/*">
+            <select id="q-difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+            <input type="text" id="q-correct" placeholder="Correct Answer (e.g. A)">
+            <button onclick="handleUpload()" class="btn-upload">Publish Question</button>
+        </div>
+
+        <div class="admin-controls">
+            <button class="admin-btn">Manage Students</button>
+            <button class="admin-btn">Create Course</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="teacher-logic.js"></script>
+    <script src="student-logic.js"></script>
+</body>
+  </html>
+              
