@@ -1,128 +1,93 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>mBio World Pro | NEET Biology</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mBio World Pro</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div id="auth-section" class="screen flex-center">
-        <div class="auth-card animate-in">
-            <h1 class="brand">mBio World</h1>
-            <p class="tagline">Target NEET Biology</p>
-            <div id="login-box">
-                <input type="email" id="email" placeholder="ইমেইল (Email)">
-                <input type="password" id="password" placeholder="পাসওয়ার্ড (Password)">
-                <button class="btn primary-btn" onclick="handleLogin()">লগইন করুন</button>
-                <div class="auth-footer">
-                    <span onclick="toggleAuth('reg')">নতুন অ্যাকাউন্ট খুলুন</span>
-                    <span onclick="forgotPW()">পাসওয়ার্ড ভুলে গেছেন?</span>
-                </div>
+    <section id="auth-screen" class="panel active">
+        <div class="glass-card">
+            <h1 class="logo">mBio World</h1>
+            <div id="auth-inputs">
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="handleLogin()" class="main-btn">Login</button>
+                <button onclick="toggleView('reg-box')" class="link-btn">New Student? Register</button>
             </div>
             <div id="reg-box" class="hidden">
-                <input type="text" id="reg-name" placeholder="আপনার নাম">
-                <input type="email" id="reg-email" placeholder="ইমেইল">
-                <input type="password" id="reg-password" placeholder="নতুন পাসওয়ার্ড">
-                <button class="btn secondary-btn" onclick="handleRegister()">রেজিস্ট্রেশন করুন</button>
-                <p onclick="toggleAuth('login')" class="back-link">লগইন পেজে ফিরুন</p>
+                <input type="text" id="reg-name" placeholder="Full Name">
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="password" id="reg-password" placeholder="Password">
+                <button onclick="handleRegister()" class="main-btn">Create Account</button>
+                <button onclick="toggleView('auth-inputs')" class="link-btn">Back to Login</button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="student-panel" class="screen hidden">
+    <section id="student-panel" class="panel">
         <header class="app-bar">
-            <div class="user-info">
-                <img src="https://ui-avatars.com/api/?name=User&background=random" id="user-pfp">
-                <span id="user-name-display">Student</span>
-            </div>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-power-off"></i></button>
+            <button onclick="goBack()" class="back-btn">←</button>
+            <span id="nav-title">Dashboard</span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
         </header>
-
-        <main class="container">
-            <div class="stats-row">
-                <div class="stat-card">
-                    <i class="fas fa-chart-line"></i>
-                    <p>Accuracy</p>
-                    <h3 id="acc-val">0%</h3>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-check-circle"></i>
-                    <p>Completed</p>
-                    <h3 id="comp-val">0</h3>
-                </div>
+        <div class="content">
+            <div class="overall-progress">
+                <div class="circle">85%</div>
+                <p>Syllabus Completed</p>
             </div>
-
-            <div class="menu-grid">
-                <div class="menu-item" onclick="showQuiz()">
-                    <div class="icon-circle bg-1"><i class="fas fa-play"></i></div>
-                    <p>Daily Quiz</p>
-                </div>
-                <div class="menu-item" onclick="openNCERT()">
-                    <div class="icon-circle bg-2"><i class="fas fa-book"></i></div>
-                    <p>NCERT PDF</p>
-                </div>
-                <div class="menu-item">
-                    <div class="icon-circle bg-3"><i class="fas fa-medal"></i></div>
-                    <p>Leaderboard</p>
-                </div>
-                <div class="menu-item">
-                    <div class="icon-circle bg-4"><i class="fas fa-history"></i></div>
-                    <p>PYQ Practice</p>
-                </div>
-            </div>
-
-            <div id="quiz-engine" class="overlay hidden">
-                <div class="quiz-card">
-                    <div class="quiz-header">
-                        <div class="timer-box" id="timer-display">60s</div>
-                        <span id="attempt-info">Attempt 1/3</span>
-                    </div>
-                    <img id="q-img" src="" alt="Question">
-                    <div class="options-grid">
-                        <button class="opt-btn" onclick="submitAns('A')">A</button>
-                        <button class="opt-btn" onclick="submitAns('B')">B</button>
-                        <button class="opt-btn" onclick="submitAns('C')">C</button>
-                        <button class="opt-btn" onclick="submitAns('D')">D</button>
-                    </div>
-                    <button class="btn close-btn" onclick="closeQuiz()">Exit Quiz</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="teacher-panel" class="screen hidden">
-        <header class="app-bar bg-dark">
-            <span>👨‍🏫 Teacher Control Panel</span>
-            <button onclick="logout()">Logout</button>
-        </header>
-        <div class="container">
-            <div class="card upload-card">
-                <h3>Direct Gallery Upload</h3>
-                <div class="drop-zone" onclick="document.getElementById('file-input').click()">
-                    <i class="fas fa-image"></i>
-                    <p id="file-label">গ্যালারি থেকে প্রশ্ন সিলেক্ট করুন</p>
-                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="previewImg(this)">
-                </div>
-                <img id="preview" class="hidden preview-img">
-                <input type="text" id="correct-ans" placeholder="সঠিক উত্তর (যেমন: A)">
-                <select id="diff-level">
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                </select>
-                <button class="btn primary-btn" onclick="teacherUpload()">PUBLISH LIVE</button>
+            <div class="grid">
+                <div class="card" onclick="openSection('ncert')">NCERT Library</div>
+                <div class="card" onclick="openSection('quiz')">Daily Quiz</div>
+                <div class="card" onclick="openSection('pyq')">PYQ Vault</div>
+                <div class="card" onclick="openSection('results')">My Analytics</div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section id="quiz-screen" class="panel">
+        <div class="quiz-header">
+            <div id="timer-box">60s</div>
+            <div id="attempt-tag">Attempt 1</div>
+        </div>
+        <div class="question-container">
+            <img id="q-image-display" src="" alt="Biology Question">
+            <div class="options" id="option-group">
+                <button onclick="selectOpt('A')">A</button>
+                <button onclick="selectOpt('B')">B</button>
+                <button onclick="selectOpt('C')">C</button>
+                <button onclick="selectOpt('D')">D</button>
+            </div>
+            <div class="controls">
+                <button onclick="prevQ()">Previous</button>
+                <button id="submit-ans-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button onclick="nextQ()">Next</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="teacher-panel" class="panel">
+        <header class="app-bar"><span>Teacher Console</span> <button onclick="logout()">Logout</button></header>
+        <div class="content">
+            <div class="upload-box">
+                <h3>Gallery Upload</h3>
+                <input type="file" id="img-input" accept="image/*" onchange="previewImg(this)">
+                <img id="img-preview" class="hidden">
+                <input type="text" id="correct-ans" placeholder="Correct Answer (A/B/C/D)">
+                <button onclick="uploadQuestion()" class="main-btn">Publish to Live Quiz</button>
+            </div>
+            <div class="student-manager">
+                <h3>Student Access Control</h3>
+                <div id="student-list"></div>
+            </div>
+        </div>
+    </section>
 
     <script src="app.js"></script>
 </body>
-    </html>
-    
+                    </html>
+                    
