@@ -1,68 +1,61 @@
-// 1. আপনার দেওয়া সঠিক Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
   authDomain: "mbio-world.firebaseapp.com",
   projectId: "mbio-world",
   storageBucket: "mbio-world.firebasestorage.app",
   messagingSenderId: "423038302215",
-  appId: "1:423038302215:web:6d241c7e89af55a2fdd2a2",
-  measurementId: "G-NRNGST3D3K"
+  appId: "1:423038302215:web:6d241c7e89af55a2fdd2a2"
 };
 
-// 2. Firebase Initialize
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 3. Login Function (স্টুডেন্ট এবং টিচার আলাদা করবে)
-function handleLogin() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    const errorText = document.getElementById('auth-error');
+function toggleAuth(type) {
+    document.getElementById('login-form').classList.toggle('hidden', type === 'register');
+    document.getElementById('register-form').classList.toggle('hidden', type === 'login');
+}
 
-    if (!email || !password) {
-        errorText.innerText = "দয়া করে ইমেইল এবং পাসওয়ার্ড দিন।";
-        return;
-    }
+// Student Registration
+function handleRegister() {
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-password').value;
+    const name = document.getElementById('reg-name').value;
 
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("Logged in as:", user.email);
-            // ডাটাবেস থেকে ইউজারের রোল (Student/Teacher) চেক করা
-            checkUserRole(user.uid);
-        })
-        .catch((error) => {
-            errorText.innerText = "ভুল ইমেইল বা পাসওয়ার্ড। আবার চেষ্টা করুন।";
+    auth.createUserWithEmailAndPassword(email, pass).then(res => {
+        db.collection("users").doc(res.user.uid).set({
+            name: name,
+            email: email,
+            role: "student", // ডিফল্টভাবে সবাই স্টুডেন্ট
+            status: "active"
+        }).then(() => {
+            alert("Registration Successful!");
+            location.reload();
         });
+    }).catch(err => alert(err.message));
 }
 
-// 4. User Role Checker Function
-function checkUserRole(uid) {
-    db.collection("users").doc(uid).get().then((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            if (userData.role === "teacher") {
-                // টিচার প্যানেল দেখাও
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('teacher-dashboard').style.display = 'block';
+// Login with Role Check
+function handleLogin() {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+
+    auth.signInWithEmailAndPassword(email, pass).then(res => {
+        db.collection("users").doc(res.user.uid).get().then(doc => {
+            document.getElementById('auth-section').classList.add('hidden');
+            if (doc.data().role === "teacher") {
+                document.getElementById('teacher-dashboard').classList.remove('hidden');
             } else {
-                // স্টুডেন্ট ড্যাশবোর্ড দেখাও
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('student-dashboard').style.display = 'block';
+                document.getElementById('student-dashboard').classList.remove('hidden');
             }
-        } else {
-            alert("আপনার ইউজার প্রোফাইল ডাটাবেসে পাওয়া যায়নি। অ্যাডমিনের সাথে যোগাযোগ করুন।");
-        }
-    }).catch((error) => {
-        console.error("Error getting role:", error);
-    });
+        });
+    }).catch(err => alert("Login Failed: " + err.message));
 }
 
-// 5. Logout Function
-function logout() {
-    auth.signOut().then(() => {
-        location.reload(); // পেজ রিলোড করে আবার লগইন স্ক্রিনে ফিরিয়ে নেওয়া
-    });
-              }
+function forgotPassword() {
+    const email = document.getElementById('email').value;
+    if(!email) return alert("Please enter your email first");
+    auth.sendPasswordResetEmail(email).then(() => alert("Password reset link sent to email!"));
+}
 
+function logout() { auth.signOut().then(() => location.reload()); }
