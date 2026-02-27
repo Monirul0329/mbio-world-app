@@ -3,80 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mBio World | NEET Pro</title>
+    <title>mBio World | NEET Biology Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --main: #00b894; --dark: #2d3436; --light: #f5f6fa; --accent: #0984e3; }
+        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; padding: 0; overflow-x: hidden; }
+        .hidden { display: none !important; }
+        .btn { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
+        
+        /* Auth Screen */
+        .auth-container { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #00b894, #00cec9); }
+        .auth-card { background: white; padding: 30px; border-radius: 20px; width: 320px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .primary-btn { width: 100%; padding: 12px; background: var(--main); color: white; margin-top: 10px; }
+
+        /* Dashboard Layout */
+        .nav { background: var(--dark); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+        
+        /* Student Panel Stats */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card b { color: var(--main); font-size: 20px; }
+
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-item { background: white; padding: 25px 10px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .menu-item i { font-size: 30px; color: var(--accent); margin-bottom: 10px; display: block; }
+
+        /* Quiz UI */
+        .quiz-box { background: white; padding: 20px; border-radius: 20px; position: relative; margin-top: 20px; }
+        .timer-circle { width: 70px; height: 70px; border: 5px solid var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin: 0 auto 15px; color: var(--dark); }
+        #q-img { width: 100%; border-radius: 10px; border: 1px solid #eee; margin: 15px 0; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt-btn { padding: 15px; background: #f1f2f6; border: 1px solid #ddd; border-radius: 10px; }
+
+        /* Teacher Panel */
+        .teacher-card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        .upload-area { border: 2px dashed var(--main); padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
     <div id="auth-section" class="auth-container">
         <div class="auth-card">
-            <h1 class="logo">mBio World</h1>
+            <h1 style="color: var(--main); margin:0;">mBio World</h1>
+            <p style="font-size: 12px; color: #636e72;">NEET Biology Specialist</p>
             <div id="login-box">
-                <input type="email" id="email" placeholder="Email">
+                <input type="email" id="email" placeholder="Email Address">
                 <input type="password" id="password" placeholder="Password">
-                <button class="primary-btn" onclick="handleLogin()">Login</button>
-                <p class="toggle-text">New Student? <span onclick="toggleAuth('reg')">Register</span></p>
-                <p class="forgot" onclick="forgotPassword()">Forgot Password?</p>
+                <button class="btn primary-btn" onclick="handleLogin()">LOGIN</button>
+                <p style="font-size: 13px; margin-top: 15px;">New? <span style="color:var(--accent); cursor:pointer;" onclick="toggleAuth('reg')">Register Now</span></p>
+                <p style="font-size: 12px; color: gray; cursor: pointer;" onclick="forgotPW()">Forgot Password?</p>
             </div>
             <div id="reg-box" class="hidden">
                 <input type="text" id="reg-name" placeholder="Full Name">
                 <input type="email" id="reg-email" placeholder="Email">
-                <input type="password" id="reg-password" placeholder="Set Password">
-                <button class="primary-btn" onclick="handleRegister()">Join as Student</button>
-                <p class="toggle-text" onclick="toggleAuth('login')">Back to Login</p>
+                <input type="password" id="reg-password" placeholder="Password">
+                <button class="btn primary-btn" style="background:var(--accent);" onclick="handleRegister()">JOIN AS STUDENT</button>
+                <p style="cursor:pointer;" onclick="toggleAuth('login')">Back to Login</p>
             </div>
         </div>
     </div>
 
-    <div id="student-panel" class="hidden main-panel">
-        <nav class="top-nav">
-            <span id="display-name">Student</span>
-            <button onclick="logout()">Logout</button>
+    <div id="student-panel" class="hidden">
+        <nav class="nav">
+            <span><i class="fas fa-user-graduate"></i> <span id="user-name-display">Student</span></span>
+            <button class="btn" onclick="logout()" style="background:red; color:white; padding: 5px 10px;">Logout</button>
         </nav>
-        <div class="dashboard-grid">
-            <div class="menu-item" onclick="startQuiz()">
-                <i class="fas fa-play"></i>
-                <p>Start Quiz</p>
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">Course Comp.<br><b id="comp-val">0%</b></div>
+                <div class="stat-card">Accuracy<br><b id="acc-val">0%</b></div>
             </div>
-            <div class="menu-item">
-                <i class="fas fa-book"></i>
-                <p>NCERT Library</p>
+            <div class="menu-grid" id="main-menu">
+                <div class="menu-item" onclick="loadQuiz()"><i class="fas fa-play-circle"></i>Daily Quiz</div>
+                <div class="menu-item"><i class="fas fa-file-pdf"></i>NCERT PDF</div>
+                <div class="menu-item"><i class="fas fa-trophy"></i>Leaderboard</div>
+                <div class="menu-item"><i class="fas fa-chart-bar"></i>Analysis</div>
             </div>
-        </div>
-        <div id="quiz-area" class="hidden quiz-container">
-            <div class="timer" id="timer">60s</div>
-            <div id="q-content">
-                <img id="q-image" src="" style="width:100%; border-radius:10px;">
-                <div class="options-grid">
-                    <button onclick="checkAns('A')">A</button>
-                    <button onclick="checkAns('B')">B</button>
-                    <button onclick="checkAns('C')">C</button>
-                    <button onclick="checkAns('D')">D</button>
+
+            <div id="quiz-engine" class="hidden quiz-box">
+                <div class="timer-circle" id="timer-display">60s</div>
+                <p id="attempt-info" style="text-align:center; font-weight:bold; color:red;">Attempt 1/3</p>
+                <img id="q-img" src="" alt="Question">
+                <div class="opt-grid">
+                    <button class="btn opt-btn" onclick="submitAns('A')">A</button>
+                    <button class="btn opt-btn" onclick="submitAns('B')">B</button>
+                    <button class="btn opt-btn" onclick="submitAns('C')">C</button>
+                    <button class="btn opt-btn" onclick="submitAns('D')">D</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="teacher-panel" class="hidden main-panel">
-        <nav class="top-nav">
-            <span>Teacher Console</span>
-            <button onclick="logout()">Logout</button>
-        </nav>
-        <div class="teacher-content">
-            <div class="card">
-                <h3>Upload Question</h3>
-                <input type="file" id="q-file">
-                <input type="text" id="q-ans" placeholder="Answer (A/B/C/D)">
-                <button onclick="uploadQuestion()">Upload & Publish</button>
+    <div id="teacher-panel" class="hidden">
+        <nav class="nav"><span>👨‍🏫 Teacher Dashboard</span> <button onclick="logout()">Logout</button></nav>
+        <div class="container">
+            <div class="teacher-card">
+                <h3>Direct Gallery Upload</h3>
+                <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--main);"></i>
+                    <p>Click to Select Question Image</p>
+                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="previewImg(this)">
+                </div>
+                <img id="preview" src="" class="hidden" style="width:100%; margin-top:10px; border-radius:10px;">
+                <input type="text" id="correct-ans" placeholder="Correct Answer (e.g. A)">
+                <select id="diff-level">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+                <button class="btn primary-btn" onclick="teacherUpload()">PUBLISH QUESTION</button>
             </div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
-</html>
+    </html>
+                        
