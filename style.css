@@ -1,19 +1,19 @@
-:root { --p: #00b894; --s: #0984e3; --d: #2d3436; --w: #ffffff; }
-body { font-family: 'Poppins', sans-serif; margin: 0; background: #f0f2f5; }
-.hidden { display: none !important; }
-.panel { display: none; min-height: 100vh; }
-.panel.active { display: block; }
+:root { --main: #00b894; --bg: #f5f6fa; --dark: #2d3436; }
+body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); }
+.screen { display: none; padding: 20px; min-height: 100vh; }
+.screen.active { display: block; }
+.hidden { display: none; }
 
-/* Auth Styling */
-.glass-card { background: var(--w); padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; margin: 100px auto; text-align: center; }
-input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-.main-btn { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+/* Dashboard Cards */
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+.card { background: #fff; padding: 30px 10px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
+.card i { font-size: 24px; color: var(--main); margin-bottom: 10px; display: block; }
 
-/* Quiz Timer Styling */
-#timer-box { width: 70px; height: 70px; border: 4px solid var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin: 20px auto; }
-.question-container img { width: 100%; border-radius: 15px; margin-bottom: 20px; }
-.options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.options button { padding: 15px; border: 1px solid #ddd; background: white; border-radius: 12px; font-weight: bold; }
+/* Smart Timer UI */
+.timer { width: 60px; height: 60px; border: 4px solid var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 10px auto; }
+#question-image { width: 100%; border-radius: 15px; border: 1px solid #ddd; }
 
-/* Teacher Upload */
-#img-preview { width: 100%; border-radius: 10px; margin: 10px 0; }
+/* Buttons */
+.btn-main { background: var(--main); color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
+.options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+.options-container button { padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 10px; font-weight: bold; }
