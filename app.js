@@ -11,75 +11,78 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- THE SMART QUIZ LOGIC ---
-let quizData = { currentAttempt: 1, timeLeft: 60, timer: null };
+// 🚀 Core View Switcher (Fixes the overlapping screens)
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+}
 
-const app = {
-    showScreen: (id) => {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    },
-    login: () => {
-        const e = document.getElementById('login-email').value;
-        const p = document.getElementById('login-pass').value;
-        auth.signInWithEmailAndPassword(e, p).then(res => {
-            db.collection("users").doc(res.user.uid).get().then(doc => {
-                const role = doc.data().role;
-                if(role === 'teacher') app.showScreen('screen-teacher');
-                else app.showScreen('screen-dashboard');
-                document.getElementById('user-display-name').innerText = doc.data().name;
-            });
-        });
-    },
-    logout: () => auth.signOut().then(() => location.reload())
-};
-
-const quiz = {
-    startTimer: () => {
-        clearInterval(quizData.timer);
-        if(quizData.currentAttempt === 2) quizData.timeLeft = 50;
-        if(quizData.currentAttempt === 3) quizData.timeLeft = 40;
-
-        quizData.timer = setInterval(() => {
-            quizData.timeLeft--;
-            document.getElementById('quiz-timer').innerText = quizData.timeLeft + "s";
-            if(quizData.timeLeft <= 0) {
-                clearInterval(quizData.timer);
-                if(quizData.currentAttempt < 3) {
-                    quizData.currentAttempt++;
-                    document.getElementById('submit-ans-btn').disabled = true;
-                    alert("Time Up! Moving to Attempt " + quizData.currentAttempt);
-                    quiz.startTimer();
-                } else { alert("Quiz Finished!"); location.reload(); }
-            }
-        }, 1000);
-    },
-    submitAnswer: () => {
-        // Here we handle the suggest 2: Error Vault
-        // If wrong, add to 'users/uid/errorVault/questionID'
-        alert("Answer Submitted!");
+// --- AUTH LOGIC ---
+function toggleAuth(type) {
+    if(type === 'reg') {
+        document.getElementById('login-box').classList.add('hidden');
+        document.getElementById('reg-box').classList.remove('hidden');
+    } else {
+        document.getElementById('reg-box').classList.add('hidden');
+        document.getElementById('login-box').classList.remove('hidden');
     }
-};
+}
 
-const teacher = {
-    preview: (input) => {
-        const reader = new FileReader();
+async function handleLogin() {
+    const e = document.getElementById('email').value;
+    const p = document.getElementById('password').value;
+    try {
+        const res = await auth.signInWithEmailAndPassword(e, p);
+        const doc = await db.collection("users").doc(res.user.uid).get();
+        if(doc.data().role === 'teacher') showView('screen-teacher');
+        else {
+            document.getElementById('user-name').innerText = doc.data().name;
+            showView('screen-student');
+        }
+    } catch(err) { alert(err.message); }
+}
+
+async function handleRegister() {
+    const n = document.getElementById('reg-name').value;
+    const e = document.getElementById('reg-email').value;
+    const p = document.getElementById('reg-password').value;
+    try {
+        const res = await auth.createUserWithEmailAndPassword(e, p);
+        await db.collection("users").doc(res.user.uid).set({ name: n, role: 'student' });
+        location.reload();
+    } catch(err) { alert(err.message); }
+}
+
+// --- TEACHER UPLOAD ---
+function previewFile(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
         reader.onload = e => {
-            document.getElementById('preview-box').src = e.target.result;
-            document.getElementById('preview-box').classList.remove('hidden');
+            document.getElementById('upload-preview').src = e.target.result;
+            document.getElementById('upload-preview').classList.remove('hidden');
         };
         reader.readAsDataURL(input.files[0]);
-    },
-    publish: async () => {
-        const img = document.getElementById('preview-box').src;
-        const ans = document.getElementById('q-ans').value;
-        const ncert = document.getElementById('ncert-link').value; // Suggest 1: NCERT Link
-        
-        await db.collection("quizzes").add({
-            img, ans, ncert, diff: document.getElementById('q-diff').value,
-            time: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Published!");
     }
-};
-                                    
+}
+
+async function teacherUpload() {
+    const img = document.getElementById('upload-preview').src;
+    const ans = document.getElementById('ans-input').value;
+    const ncert = document.getElementById('ncert-link').value;
+    if(!img || !ans) return alert("Fill all details!");
+
+    await db.collection("questions").add({ img, ans, ncert, time: new Date() });
+    alert("Question Published!");
+    location.reload();
+}
+
+// --- QUIZ LOGIC (Simplified for View Test) ---
+function openModule(type) {
+    if(type === 'quiz') {
+        showView('screen-quiz');
+        // Logic to load questions goes here
+    }
+}
+
+function logout() { auth.signOut().then(() => location.reload()); }
+          
