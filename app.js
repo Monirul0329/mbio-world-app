@@ -1,4 +1,3 @@
-          // Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
     authDomain: "mbio-world.firebaseapp.com",
@@ -12,76 +11,75 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Triple Attempt Timer Variables
-let attempt = 1;
-let timer;
-let seconds = 60;
+// --- THE SMART QUIZ LOGIC ---
+let quizData = { currentAttempt: 1, timeLeft: 60, timer: null };
 
-function startSmartTimer() {
-    clearInterval(timer);
-    if(attempt == 1) seconds = 60;
-    if(attempt == 2) seconds = 50;
-    if(attempt == 3) seconds = 40;
-
-    document.getElementById('attempt-tag').innerText = "Attempt " + attempt;
-    
-    timer = setInterval(() => {
-        seconds--;
-        document.getElementById('timer-box').innerText = seconds + "s";
-
-        if(seconds <= 0) {
-            clearInterval(timer);
-            if(attempt < 3) {
-                attempt++;
-                document.getElementById('submit-ans-btn').disabled = true; // Lock Submit
-                alert("Time's Up! Attempt " + attempt + " starts now. You can only view.");
-                startSmartTimer();
-            } else {
-                alert("Quiz Over for this question.");
-                location.reload();
-            }
-        }
-    }, 1000);
-}
-
-// Teacher Gallery Upload
-function previewImg(input) {
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('img-preview').src = e.target.result;
-        document.getElementById('img-preview').classList.remove('hidden');
-    }
-    reader.readAsDataURL(input.files[0]);
-}
-
-async function uploadQuestion() {
-    const imgData = document.getElementById('img-preview').src;
-    const ans = document.getElementById('correct-ans').value;
-    
-    await db.collection("quizzes").add({
-        image: imgData,
-        answer: ans,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert("Uploaded to Student App! ✅");
-}
-
-// Navigation Logic
-function toggleView(id) {
-    document.getElementById('reg-box').classList.add('hidden');
-    document.getElementById('auth-inputs').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
-}
-
-function handleLogin() {
-    const e = document.getElementById('email').value;
-    const p = document.getElementById('password').value;
-    auth.signInWithEmailAndPassword(e, p).then(res => {
-        db.collection("users").doc(res.user.uid).get().then(doc => {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            if(doc.data().role === 'teacher') document.getElementById('teacher-panel').classList.add('active');
-            else document.getElementById('student-panel').classList.add('active');
+const app = {
+    showScreen: (id) => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    },
+    login: () => {
+        const e = document.getElementById('login-email').value;
+        const p = document.getElementById('login-pass').value;
+        auth.signInWithEmailAndPassword(e, p).then(res => {
+            db.collection("users").doc(res.user.uid).get().then(doc => {
+                const role = doc.data().role;
+                if(role === 'teacher') app.showScreen('screen-teacher');
+                else app.showScreen('screen-dashboard');
+                document.getElementById('user-display-name').innerText = doc.data().name;
+            });
         });
-    });
-}
-              
+    },
+    logout: () => auth.signOut().then(() => location.reload())
+};
+
+const quiz = {
+    startTimer: () => {
+        clearInterval(quizData.timer);
+        if(quizData.currentAttempt === 2) quizData.timeLeft = 50;
+        if(quizData.currentAttempt === 3) quizData.timeLeft = 40;
+
+        quizData.timer = setInterval(() => {
+            quizData.timeLeft--;
+            document.getElementById('quiz-timer').innerText = quizData.timeLeft + "s";
+            if(quizData.timeLeft <= 0) {
+                clearInterval(quizData.timer);
+                if(quizData.currentAttempt < 3) {
+                    quizData.currentAttempt++;
+                    document.getElementById('submit-ans-btn').disabled = true;
+                    alert("Time Up! Moving to Attempt " + quizData.currentAttempt);
+                    quiz.startTimer();
+                } else { alert("Quiz Finished!"); location.reload(); }
+            }
+        }, 1000);
+    },
+    submitAnswer: () => {
+        // Here we handle the suggest 2: Error Vault
+        // If wrong, add to 'users/uid/errorVault/questionID'
+        alert("Answer Submitted!");
+    }
+};
+
+const teacher = {
+    preview: (input) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('preview-box').src = e.target.result;
+            document.getElementById('preview-box').classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    },
+    publish: async () => {
+        const img = document.getElementById('preview-box').src;
+        const ans = document.getElementById('q-ans').value;
+        const ncert = document.getElementById('ncert-link').value; // Suggest 1: NCERT Link
+        
+        await db.collection("quizzes").add({
+            img, ans, ncert, diff: document.getElementById('q-diff').value,
+            time: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Published!");
+    }
+};
+                                    
