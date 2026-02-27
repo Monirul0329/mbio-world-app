@@ -1,19 +1,51 @@
-:root { --main: #00b894; --bg: #f5f6fa; --dark: #2d3436; }
-body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); }
-.screen { display: none; padding: 20px; min-height: 100vh; }
-.screen.active { display: block; }
-.hidden { display: none; }
+:root {
+    --primary: #00b894;
+    --secondary: #0984e3;
+    --dark: #1a1a1a;
+    --light: #f8f9fa;
+    --text: #2d3436;
+}
 
-/* Dashboard Cards */
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-.card { background: #fff; padding: 30px 10px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
-.card i { font-size: 24px; color: var(--main); margin-bottom: 10px; display: block; }
+body { font-family: 'Inter', sans-serif; margin: 0; background: #eef2f3; color: var(--text); overflow: hidden; }
+.hidden { display: none !important; }
+.view { display: none; height: 100vh; width: 100%; overflow-y: auto; }
+.view.active { display: block; }
 
-/* Smart Timer UI */
-.timer { width: 60px; height: 60px; border: 4px solid var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 10px auto; }
-#question-image { width: 100%; border-radius: 15px; border: 1px solid #ddd; }
+/* Auth Styling */
+#screen-auth { background: linear-gradient(135deg, #00b894, #0093a3); display: flex; align-items: center; justify-content: center; }
+.auth-card { background: white; padding: 40px 30px; border-radius: 25px; width: 85%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+.brand { font-size: 32px; margin-bottom: 5px; color: var(--primary); }
+.brand span { color: var(--dark); }
+.tagline { color: #636e72; font-size: 14px; margin-bottom: 30px; }
 
-/* Buttons */
-.btn-main { background: var(--main); color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
-.options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-.options-container button { padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 10px; font-weight: bold; }
+input { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #dfe6e9; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+/* Dashboard Styling */
+.navbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+.user-profile { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.user-profile img { width: 35px; border-radius: 50%; }
+
+.container { padding: 20px; }
+.stats-card { background: white; border-radius: 20px; padding: 20px; display: flex; justify-content: space-around; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.stat h3 { margin: 5px 0 0; color: var(--primary); }
+.stat span { font-size: 12px; color: #b2bec3; text-transform: uppercase; }
+.stat-divider { width: 1px; background: #eee; }
+
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+.menu-card { background: white; padding: 25px 15px; border-radius: 22px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.03); cursor: pointer; }
+.icon-wrap { width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 22px; color: white; }
+.bg-green { background: var(--primary); }
+.bg-blue { background: var(--secondary); }
+.bg-orange { background: #fdcb6e; }
+.bg-purple { background: #a29bfe; }
+
+/* Quiz UI */
+.quiz-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: white; }
+.timer-display { width: 60px; height: 60px; border: 4px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+.question-frame { background: #f9f9f9; padding: 10px; border-radius: 15px; margin: 20px; }
+#question-img { width: 100%; border-radius: 10px; }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; }
+.opt-btn { padding: 18px; border: 2px solid #eee; background: white; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.opt-btn:active { background: var(--primary); color: white; }
+               
