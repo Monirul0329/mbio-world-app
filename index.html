@@ -2,99 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mBio World | NEET Biology Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>mBio World Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <section id="screen-auth" class="screen active">
-        <div class="auth-container">
-            <h1 class="logo">mBio World</h1>
-            <div id="login-form">
-                <input type="email" id="login-email" placeholder="Email">
-                <input type="password" id="login-pass" placeholder="Password">
-                <button class="btn-main" onclick="app.login()">Login</button>
-                <p onclick="app.showScreen('screen-reg')">New Student? Register</p>
+    <div id="app-container">
+        <section id="screen-auth" class="view active">
+            <div class="auth-card">
+                <h1 class="brand">mBio <span>World</span></h1>
+                <p class="tagline">Target NEET Biology</p>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email Address">
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                <button class="btn-primary" onclick="handleLogin()">Login</button>
+                <div class="auth-links">
+                    <span onclick="toggleAuth('reg')">New Student? Register</span>
+                    <span onclick="forgotPassword()">Forgot Password?</span>
+                </div>
             </div>
-        </div>
-    </section>
+            
+            <div id="reg-box" class="auth-card hidden">
+                <h2>Join mBio World</h2>
+                <div class="input-group">
+                    <input type="text" id="reg-name" placeholder="Full Name">
+                    <input type="email" id="reg-email" placeholder="Email">
+                    <input type="password" id="reg-password" placeholder="Password">
+                </div>
+                <button class="btn-primary" onclick="handleRegister()">Create Account</button>
+                <p class="back-link" onclick="toggleAuth('login')">Back to Login</p>
+            </div>
+        </section>
 
-    <section id="screen-reg" class="screen">
-        <div class="auth-container">
-            <h2>Student Registration</h2>
-            <input type="text" id="reg-name" placeholder="Full Name">
-            <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-pass" placeholder="Password">
-            <button class="btn-main" onclick="app.register()">Create Account</button>
-            <button class="btn-back" onclick="app.showScreen('screen-auth')">Back</button>
-        </div>
-    </section>
+        <section id="screen-student" class="view">
+            <header class="navbar">
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User&background=00b894&color=fff" alt="P">
+                    <span id="user-name">NEET Aspirant</span>
+                </div>
+                <button class="icon-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </header>
+            
+            <div class="container">
+                <div class="stats-card">
+                    <div class="stat"><span>Syllabus</span><h3 id="stat-syllabus">0%</h3></div>
+                    <div class="stat-divider"></div>
+                    <div class="stat"><span>Accuracy</span><h3 id="stat-accuracy">0%</h3></div>
+                </div>
 
-    <section id="screen-dashboard" class="screen">
-        <header class="app-header">
-            <span>Welcome, <b id="user-display-name">Student</b></span>
-            <button onclick="app.logout()">Logout</button>
-        </header>
-        <div class="main-content">
-            <div class="progress-section">
-                <div class="stat-box">Syllabus: <b id="total-progress">0%</b></div>
-                <div class="stat-box">Accuracy: <b id="user-accuracy">0%</b></div>
+                <div class="action-grid">
+                    <div class="menu-card" onclick="openModule('ncert')">
+                        <div class="icon-wrap bg-green"><i class="fas fa-book-open"></i></div>
+                        <p>NCERT Library</p>
+                    </div>
+                    <div class="menu-card" onclick="openModule('quiz')">
+                        <div class="icon-wrap bg-blue"><i class="fas fa-bolt"></i></div>
+                        <p>Daily Quiz</p>
+                    </div>
+                    <div class="menu-card" onclick="openModule('vault')">
+                        <div class="icon-wrap bg-orange"><i class="fas fa-shield-virus"></i></div>
+                        <p>Error Vault</p>
+                    </div>
+                    <div class="menu-card">
+                        <div class="icon-wrap bg-purple"><i class="fas fa-medal"></i></div>
+                        <p>Leaderboard</p>
+                    </div>
+                </div>
             </div>
-            <div class="menu-grid">
-                <div class="card" onclick="app.openNCERT()"><i class="fas fa-book"></i> NCERT Books</div>
-                <div class="card" onclick="app.openCourse()"><i class="fas fa-graduation-cap"></i> My Courses</div>
-                <div class="card" onclick="app.openErrorVault()"><i class="fas fa-exclamation-triangle"></i> Error Vault</div>
-                <div class="card" onclick="app.openQuiz()"><i class="fas fa-play"></i> Daily Quiz</div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="screen-quiz" class="screen">
-        <div class="quiz-nav">
-            <button class="btn-back" onclick="app.showScreen('screen-dashboard')">← Exit</button>
-            <div id="quiz-timer" class="timer">60s</div>
-            <span id="attempt-info">Attempt 1</span>
-        </div>
-        <div class="question-area">
-            <img id="question-image" src="" alt="Question">
-            <div class="options-container">
-                <button onclick="quiz.select('A')">A</button>
-                <button onclick="quiz.select('B')">B</button>
-                <button onclick="quiz.select('C')">C</button>
-                <button onclick="quiz.select('D')">D</button>
+        <section id="screen-quiz" class="view">
+            <div class="quiz-header">
+                <button class="back-btn" onclick="showView('screen-student')"><i class="fas fa-arrow-left"></i></button>
+                <div class="timer-display" id="quiz-timer">60s</div>
+                <span id="attempt-badge">Attempt 1</span>
             </div>
-            <div class="nav-controls">
-                <button onclick="quiz.prev()">Previous</button>
-                <button id="submit-ans-btn" onclick="quiz.submitAnswer()">Submit Answer</button>
-                <button onclick="quiz.next()">Next</button>
+            <div class="quiz-body">
+                <div class="question-frame">
+                    <img id="question-img" src="" alt="Question Image">
+                </div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="selectOption('A')">A</button>
+                    <button class="opt-btn" onclick="selectOption('B')">B</button>
+                    <button class="opt-btn" onclick="selectOption('C')">C</button>
+                    <button class="opt-btn" onclick="selectOption('D')">D</button>
+                </div>
+                <div class="quiz-footer">
+                    <button class="nav-btn" onclick="prevQuestion()">Previous</button>
+                    <button class="btn-submit" onclick="submitCurrentAnswer()">Submit</button>
+                    <button class="nav-btn" onclick="nextQuestion()">Next</button>
+                </div>
             </div>
-            <button class="btn-finish" onclick="quiz.finish()">Finish Quiz</button>
-        </div>
-    </section>
+        </section>
 
-    <section id="screen-teacher" class="screen">
-        <header class="app-header">Teacher Console</header>
-        <div class="upload-section">
-            <h3>Direct Question Upload</h3>
-            <input type="file" id="q-upload" accept="image/*" onchange="teacher.preview(this)">
-            <img id="preview-box" class="hidden">
-            <input type="text" id="q-ans" placeholder="Correct Answer (A/B/C/D)">
-            <input type="text" id="ncert-link" placeholder="NCERT Page/Para Link">
-            <select id="q-diff">
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-            </select>
-            <button class="btn-main" onclick="teacher.publish()">Publish Live</button>
-        </div>
-    </section>
+        <section id="screen-teacher" class="view">
+            <header class="navbar">
+                <span>Teacher Control</span>
+                <button onclick="logout()">Logout</button>
+            </header>
+            <div class="container">
+                <div class="upload-card">
+                    <h3>Post New Question</h3>
+                    <div class="file-drop" onclick="document.getElementById('file-input').click()">
+                        <i class="fas fa-image"></i>
+                        <p id="file-label">Select from Gallery</p>
+                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="previewFile(this)">
+                    </div>
+                    <img id="upload-preview" class="hidden preview-img">
+                    <input type="text" id="ans-input" placeholder="Correct Answer (A/B/C/D)">
+                    <input type="text" id="ncert-link" placeholder="NCERT Page Reference">
+                    <button class="btn-primary" onclick="teacherUpload()">Publish to Students</button>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <script src="app.js"></script>
 </body>
-                </html>
-                
+    </html>
+                            
