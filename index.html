@@ -3,91 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mBio World Pro</title>
+    <title>mBio World | NEET Biology Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <section id="auth-screen" class="panel active">
-        <div class="glass-card">
+
+    <section id="screen-auth" class="screen active">
+        <div class="auth-container">
             <h1 class="logo">mBio World</h1>
-            <div id="auth-inputs">
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Password">
-                <button onclick="handleLogin()" class="main-btn">Login</button>
-                <button onclick="toggleView('reg-box')" class="link-btn">New Student? Register</button>
-            </div>
-            <div id="reg-box" class="hidden">
-                <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="email" id="reg-email" placeholder="Email">
-                <input type="password" id="reg-password" placeholder="Password">
-                <button onclick="handleRegister()" class="main-btn">Create Account</button>
-                <button onclick="toggleView('auth-inputs')" class="link-btn">Back to Login</button>
+            <div id="login-form">
+                <input type="email" id="login-email" placeholder="Email">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button class="btn-main" onclick="app.login()">Login</button>
+                <p onclick="app.showScreen('screen-reg')">New Student? Register</p>
             </div>
         </div>
     </section>
 
-    <section id="student-panel" class="panel">
-        <header class="app-bar">
-            <button onclick="goBack()" class="back-btn">←</button>
-            <span id="nav-title">Dashboard</span>
-            <button onclick="logout()" class="logout-btn">Logout</button>
+    <section id="screen-reg" class="screen">
+        <div class="auth-container">
+            <h2>Student Registration</h2>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button class="btn-main" onclick="app.register()">Create Account</button>
+            <button class="btn-back" onclick="app.showScreen('screen-auth')">Back</button>
+        </div>
+    </section>
+
+    <section id="screen-dashboard" class="screen">
+        <header class="app-header">
+            <span>Welcome, <b id="user-display-name">Student</b></span>
+            <button onclick="app.logout()">Logout</button>
         </header>
-        <div class="content">
-            <div class="overall-progress">
-                <div class="circle">85%</div>
-                <p>Syllabus Completed</p>
+        <div class="main-content">
+            <div class="progress-section">
+                <div class="stat-box">Syllabus: <b id="total-progress">0%</b></div>
+                <div class="stat-box">Accuracy: <b id="user-accuracy">0%</b></div>
             </div>
-            <div class="grid">
-                <div class="card" onclick="openSection('ncert')">NCERT Library</div>
-                <div class="card" onclick="openSection('quiz')">Daily Quiz</div>
-                <div class="card" onclick="openSection('pyq')">PYQ Vault</div>
-                <div class="card" onclick="openSection('results')">My Analytics</div>
-            </div>
-        </div>
-    </section>
-
-    <section id="quiz-screen" class="panel">
-        <div class="quiz-header">
-            <div id="timer-box">60s</div>
-            <div id="attempt-tag">Attempt 1</div>
-        </div>
-        <div class="question-container">
-            <img id="q-image-display" src="" alt="Biology Question">
-            <div class="options" id="option-group">
-                <button onclick="selectOpt('A')">A</button>
-                <button onclick="selectOpt('B')">B</button>
-                <button onclick="selectOpt('C')">C</button>
-                <button onclick="selectOpt('D')">D</button>
-            </div>
-            <div class="controls">
-                <button onclick="prevQ()">Previous</button>
-                <button id="submit-ans-btn" onclick="submitAnswer()">Submit Answer</button>
-                <button onclick="nextQ()">Next</button>
+            <div class="menu-grid">
+                <div class="card" onclick="app.openNCERT()"><i class="fas fa-book"></i> NCERT Books</div>
+                <div class="card" onclick="app.openCourse()"><i class="fas fa-graduation-cap"></i> My Courses</div>
+                <div class="card" onclick="app.openErrorVault()"><i class="fas fa-exclamation-triangle"></i> Error Vault</div>
+                <div class="card" onclick="app.openQuiz()"><i class="fas fa-play"></i> Daily Quiz</div>
             </div>
         </div>
     </section>
 
-    <section id="teacher-panel" class="panel">
-        <header class="app-bar"><span>Teacher Console</span> <button onclick="logout()">Logout</button></header>
-        <div class="content">
-            <div class="upload-box">
-                <h3>Gallery Upload</h3>
-                <input type="file" id="img-input" accept="image/*" onchange="previewImg(this)">
-                <img id="img-preview" class="hidden">
-                <input type="text" id="correct-ans" placeholder="Correct Answer (A/B/C/D)">
-                <button onclick="uploadQuestion()" class="main-btn">Publish to Live Quiz</button>
+    <section id="screen-quiz" class="screen">
+        <div class="quiz-nav">
+            <button class="btn-back" onclick="app.showScreen('screen-dashboard')">← Exit</button>
+            <div id="quiz-timer" class="timer">60s</div>
+            <span id="attempt-info">Attempt 1</span>
+        </div>
+        <div class="question-area">
+            <img id="question-image" src="" alt="Question">
+            <div class="options-container">
+                <button onclick="quiz.select('A')">A</button>
+                <button onclick="quiz.select('B')">B</button>
+                <button onclick="quiz.select('C')">C</button>
+                <button onclick="quiz.select('D')">D</button>
             </div>
-            <div class="student-manager">
-                <h3>Student Access Control</h3>
-                <div id="student-list"></div>
+            <div class="nav-controls">
+                <button onclick="quiz.prev()">Previous</button>
+                <button id="submit-ans-btn" onclick="quiz.submitAnswer()">Submit Answer</button>
+                <button onclick="quiz.next()">Next</button>
             </div>
+            <button class="btn-finish" onclick="quiz.finish()">Finish Quiz</button>
+        </div>
+    </section>
+
+    <section id="screen-teacher" class="screen">
+        <header class="app-header">Teacher Console</header>
+        <div class="upload-section">
+            <h3>Direct Question Upload</h3>
+            <input type="file" id="q-upload" accept="image/*" onchange="teacher.preview(this)">
+            <img id="preview-box" class="hidden">
+            <input type="text" id="q-ans" placeholder="Correct Answer (A/B/C/D)">
+            <input type="text" id="ncert-link" placeholder="NCERT Page/Para Link">
+            <select id="q-diff">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+            <button class="btn-main" onclick="teacher.publish()">Publish Live</button>
         </div>
     </section>
 
     <script src="app.js"></script>
 </body>
-                    </html>
-                    
+                </html>
+                
