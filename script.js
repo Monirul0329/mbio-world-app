@@ -108,9 +108,8 @@ function lockAnswer() {
   });
 }
 
-// ===== ANSWER SUBMIT BUTTON =====
-const answerBtn = document.createElement("button");
-answerBtn.textContent = "Submit Answer";
+const answerBtn = document.getElementById("answerBtn");
+
 answerBtn.onclick = () => {
   if (answerStatus[currentQuestionIndex] !== "selected") {
     alert("Select an option first!");
@@ -119,8 +118,7 @@ answerBtn.onclick = () => {
   clearInterval(timerInterval);
   lockAnswer();
 };
-document.querySelector(".quiz-container").appendChild(answerBtn);
-
+  document.getElementById("qno").textContent = currentQuestionIndex + 1;
 // ===== NEXT BUTTON =====
 document.getElementById("nextBtn").onclick = () => {
   if (answerStatus[currentQuestionIndex] !== "submitted") {
