@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>mBio World Pro | NEET Biology</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>mBio World Pro | Final NEET Edition</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -12,141 +13,153 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --primary: #00b894; --secondary: #0984e3; --bg: #f4f7f6; --white: #ffffff; --danger: #ff7675; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: #2d3436; }
+        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; --w: #ffffff; --d: #2d3436; --err: #ff7675; --v: #fdcb6e; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: var(--d); -webkit-tap-highlight-color: transparent; }
         .view { display: none; min-height: 100vh; width: 100%; }
         .view.active { display: block; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
         .hidden { display: none !important; }
 
-        /* Auth & Design */
-        #screen-auth { background: linear-gradient(135deg, #00b894, #00cec9); display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: white; padding: 40px 30px; border-radius: 30px; width: 85%; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #dfe6e9; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        /* UI Elements */
+        .btn { border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; padding: 15px; font-size: 16px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-p { background: var(--p); color: var(--w); width: 100%; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #dfe6e9; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
 
-        /* Navbar */
-        .navbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        /* Auth Screen */
+        #screen-auth { background: linear-gradient(135deg, var(--p), #00cec9); display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: var(--w); padding: 40px 30px; border-radius: 30px; width: 85%; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+        /* Dashboard */
+        .nav { background: var(--w); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; }
+        .stat-card { background: var(--w); padding: 20px; border-radius: 20px; display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-item { background: var(--w); padding: 25px 10px; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .menu-item i { font-size: 28px; margin-bottom: 10px; display: block; }
+
+        /* Quiz Engine */
+        .timer-box { width: 70px; height: 70px; border: 5px solid var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; margin: 0 auto 15px; color: var(--p); }
+        .q-window { background: var(--w); border-radius: 20px; padding: 10px; border: 1px solid #eee; margin-bottom: 15px; }
+        .q-window img { width: 100%; border-radius: 15px; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt-btn { background: var(--w); border: 2px solid #eee; padding: 18px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+        .opt-btn.active { border-color: var(--p); background: #e6fffb; }
+
+        /* Results */
+        .res-top { background: var(--p); color: var(--w); padding: 40px 20px; text-align: center; border-radius: 0 0 40px 40px; }
+        .score-circle { width: 100px; height: 100px; border: 6px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; margin: 15px auto; }
         
-        /* Quiz Interface */
-        .quiz-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 2px solid var(--bg); }
-        .timer-circle { width: 60px; height: 60px; border: 4px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: var(--primary); }
-        .q-img-container { background: white; padding: 10px; border-radius: 15px; margin: 20px 0; min-height: 200px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; }
-        .q-img-container img { max-width: 100%; border-radius: 10px; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .opt-btn { padding: 20px; border: 2px solid #dfe6e9; background: white; border-radius: 15px; font-weight: 700; cursor: pointer; }
-        .opt-btn.selected { border-color: var(--primary); background: #e6fffb; }
-        .quiz-controls { display: flex; justify-content: space-between; margin-top: 25px; gap: 10px; }
-        .nav-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; }
-
-        /* Results Dashboard */
-        .result-card { background: white; padding: 25px; border-radius: 25px; text-align: center; margin-top: 20px; }
-        .score-big { font-size: 48px; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .stat-item { padding: 15px; background: #f8f9fa; border-radius: 15px; }
+        /* Teacher List */
+        .user-row { background: var(--w); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
     <section id="screen-auth" class="view active">
         <div class="auth-card">
-            <h1 style="color:var(--primary); margin:0;">mBio World</h1>
+            <h1 style="color:var(--p); margin:0; font-weight:800;">mBio World</h1>
             <p style="color:#636e72; margin-bottom:30px;">NEET Biology Excellence</p>
-            <div id="login-fields">
+            <div id="login-box">
                 <input type="email" id="email" placeholder="Email Address">
-                <input type="password" id="password" placeholder="Password">
-                <button class="btn-primary" onclick="handleLogin()">Login</button>
-                <p onclick="toggleAuth(true)" style="margin-top:20px; cursor:pointer;">New Student? <b>Register</b></p>
+                <input type="password" id="pass" placeholder="Password">
+                <button class="btn btn-p" onclick="handleLogin()">Login</button>
+                <p onclick="toggleAuth(true)" style="margin-top:20px; font-size:14px;">New Student? <b style="color:var(--p)">Register</b></p>
             </div>
-            <div id="reg-fields" class="hidden">
+            <div id="reg-box" class="hidden">
                 <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="email" id="reg-email" placeholder="Email">
-                <input type="password" id="reg-password" placeholder="Password">
-                <button class="btn-primary" onclick="handleRegister()">Create Account</button>
-                <p onclick="toggleAuth(false)" style="margin-top:20px; cursor:pointer;">Back to Login</p>
+                <input type="email" id="reg-email" placeholder="Email Address">
+                <input type="password" id="reg-pass" placeholder="Create Password">
+                <button class="btn btn-p" onclick="handleRegister()">Create Account</button>
+                <p onclick="toggleAuth(false)" style="margin-top:20px; font-size:14px;">Back to Login</p>
             </div>
         </div>
     </section>
 
     <section id="screen-student" class="view">
-        <header class="navbar">
-            <span style="font-weight:800; color:var(--primary);">mBio World</span>
-            <button onclick="logout()" style="border:none; background:none; color:var(--danger); font-weight:700;">LOGOUT</button>
-        </header>
+        <div class="nav">
+            <span id="user-display" style="font-weight:700;">Student</span>
+            <button onclick="logout()" style="border:none; background:none; color:var(--err); font-weight:700;">LOGOUT</button>
+        </div>
         <div class="container">
-            <div style="background:white; padding:20px; border-radius:20px; display:flex; justify-content:space-around; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-                <div><small>Syllabus</small><h3 id="dash-syllabus">0%</h3></div>
+            <div class="stat-card">
+                <div><small>Completion</small><h3 id="stat-comp">0%</h3></div>
                 <div style="width:1px; background:#eee;"></div>
-                <div><small>Accuracy</small><h3 id="dash-accuracy">0%</h3></div>
+                <div><small>Error Vault</small><h3 id="stat-vault" style="color:var(--v);">0</h3></div>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:25px;">
-                <div onclick="alert('Opening NCERT PDFs...')" style="background:white; padding:30px 10px; border-radius:20px; text-align:center; cursor:pointer;">
-                    <i class="fas fa-book-open" style="font-size:24px; color:var(--primary); margin-bottom:10px;"></i>
-                    <p style="margin:0; font-weight:600;">NCERT Books</p>
+            <div class="menu-grid">
+                <div class="menu-item" onclick="alert('Loading NCERT...')">
+                    <i class="fas fa-book" style="color:var(--p)"></i><span>NCERT Books</span>
                 </div>
-                <div onclick="startQuizFlow()" style="background:white; padding:30px 10px; border-radius:20px; text-align:center; cursor:pointer;">
-                    <i class="fas fa-play" style="font-size:24px; color:var(--secondary); margin-bottom:10px;"></i>
-                    <p style="margin:0; font-weight:600;">Take Quiz</p>
+                <div class="menu-item" onclick="startQuizFlow()">
+                    <i class="fas fa-vial" style="color:var(--s)"></i><span>Daily Quiz</span>
+                </div>
+                <div class="menu-item" onclick="showVault()">
+                    <i class="fas fa-history" style="color:var(--v)"></i><span>Error Vault</span>
+                </div>
+                <div class="menu-item" onclick="alert('Leaderboard Soon')">
+                    <i class="fas fa-trophy" style="color:#f1c40f"></i><span>Ranking</span>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="screen-quiz" class="view">
-        <div class="quiz-header">
-            <button onclick="showView('screen-student')" style="border:none; background:none; font-size:20px;"><i class="fas fa-times"></i></button>
-            <div class="timer-circle" id="timer-box">60s</div>
-            <span id="attempt-tag" style="font-weight:700; color:var(--secondary);">Attempt 1</span>
+        <div class="nav">
+            <button onclick="showView('screen-student')" style="border:none; background:none; font-size:18px;"><i class="fas fa-times"></i></button>
+            <span id="att-text" style="font-weight:700; color:var(--s);">Attempt 1</span>
         </div>
         <div class="container">
-            <div class="q-img-container">
-                <img id="q-image" src="" alt="Question">
+            <div class="timer-box" id="timer-txt">60s</div>
+            <div class="q-window"><img id="q-img" src=""></div>
+            <div class="opt-grid">
+                <button class="opt-btn" onclick="pick('A')">A</button>
+                <button class="opt-btn" onclick="pick('B')">B</button>
+                <button class="opt-btn" onclick="pick('C')">C</button>
+                <button class="opt-btn" onclick="pick('D')">D</button>
             </div>
-            <div class="options-grid" id="opt-container">
-                <button class="opt-btn" onclick="selectOpt('A')">A</button>
-                <button class="opt-btn" onclick="selectOpt('B')">B</button>
-                <button class="opt-btn" onclick="selectOpt('C')">C</button>
-                <button class="opt-btn" onclick="selectOpt('D')">D</button>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn" style="flex:1; background:#ddd;" onclick="prevQ()">Prev</button>
+                <button id="sub-btn" class="btn btn-p" style="flex:2;" onclick="submitQ()">Submit</button>
+                <button class="btn" style="flex:1; background:#ddd;" onclick="nextQ()">Next</button>
             </div>
-            <div class="quiz-controls">
-                <button class="nav-btn" style="background:#ddd;" onclick="prevQ()">Previous</button>
-                <button id="submit-ans-btn" class="btn-primary" style="flex:2;" onclick="submitAnswer()">Submit Answer</button>
-                <button class="nav-btn" style="background:#ddd;" onclick="nextQ()">Next</button>
-            </div>
-            <button onclick="endQuiz()" style="width:100%; margin-top:20px; background:none; border:none; color:#636e72; text-decoration:underline;">Finish Quiz Early</button>
         </div>
     </section>
 
     <section id="screen-results" class="view">
+        <div class="res-top">
+            <h2>Result Summary</h2>
+            <div class="score-circle" id="res-score">0</div>
+            <p>Score: <span id="res-detail">0/0</span></p>
+        </div>
         <div class="container">
-            <div class="result-card">
-                <h2>Quiz Completed!</h2>
-                <div class="score-big" id="res-score">0</div>
-                <p>Final Score</p>
-                <div class="stat-grid">
-                    <div class="stat-item"><small>Correct</small><h4 id="res-correct" style="color:var(--primary); margin:5px 0;">0</h4></div>
-                    <div class="stat-item"><small>Accuracy</small><h4 id="res-acc" style="color:var(--secondary); margin:5px 0;">0%</h4></div>
-                </div>
-                <button class="btn-primary" onclick="showView('screen-student')">Back to Dashboard</button>
+            <div class="stat-card" style="margin-top:-30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                <div><small>Accuracy</small><h4 id="res-acc" style="color:var(--s);">0%</h4></div>
+                <div><small>Incorrect</small><h4 id="res-wrong" style="color:var(--err);">0</h4></div>
             </div>
+            <div class="menu-item" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-top:15px;">
+                <span>Topper Score</span><b id="topper-val" style="color:var(--p)">--</b>
+            </div>
+            <button class="btn btn-p" onclick="showView('screen-student')" style="margin-top:20px;">Back to Home</button>
         </div>
     </section>
 
     <section id="screen-teacher" class="view">
-        <header class="navbar"><span>Teacher Control</span> <button onclick="logout()">Logout</button></header>
+        <div class="nav"><b>Teacher Panel</b> <button onclick="logout()">Logout</button></div>
         <div class="container">
-            <div style="background:white; padding:20px; border-radius:20px;">
-                <h3>Add New Question</h3>
-                <input type="file" id="t-file" accept="image/*" onchange="previewT(this)">
-                <img id="t-preview" style="width:100%; border-radius:10px; margin:10px 0; display:none;">
+            <div class="menu-item" style="padding:20px; text-align:left;">
+                <h3 style="margin-top:0;">Upload JPEG Question</h3>
+                <input type="file" accept="image/*" onchange="previewImg(this)">
+                <img id="t-pre" style="width:100%; border-radius:10px; display:none; margin:10px 0;">
                 <input type="text" id="t-ans" placeholder="Correct Answer (A/B/C/D)">
-                <button class="btn-primary" onclick="uploadQ()">Publish Question</button>
+                <button class="btn btn-p" onclick="uploadQ()">Publish Live</button>
             </div>
+            <h3 style="margin-top:20px;">Student Access Control</h3>
+            <div id="user-list"></div>
         </div>
     </section>
 
     <script>
-        // 1. FIREBASE CONFIG
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
             authDomain: "mbio-world.firebaseapp.com",
@@ -159,156 +172,143 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. GLOBAL STATE
-        let questions = [];
-        let currentIndex = 0;
-        let userAnswers = {}; // { index: { choice: 'A', correct: true/false } }
-        let timer;
-        let timeLeft = 60;
-        let attempt = 1;
+        // GLOBAL APP STATE
+        let quiz = { data: [], cur: 0, answers: {}, timer: null, time: 60, att: 1 };
 
-        // 3. CORE FUNCTIONS
         function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
         function toggleAuth(isReg) {
-            document.getElementById('login-fields').classList.toggle('hidden', isReg);
-            document.getElementById('reg-fields').classList.toggle('hidden', !isReg);
+            document.getElementById('login-box').classList.toggle('hidden', isReg);
+            document.getElementById('reg-box').classList.toggle('hidden', !isReg);
         }
 
-        // 4. AUTH LOGIC
+        // AUTH ACTIONS
         async function handleLogin() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
+            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
             try {
                 const res = await auth.signInWithEmailAndPassword(e, p);
                 const doc = await db.collection("users").doc(res.user.uid).get();
-                if(doc.data().role === 'teacher') showView('screen-teacher');
-                else showView('screen-student');
-            } catch(err) { alert(err.message); }
+                if(doc.data().status === 'blocked') return alert("Access Denied by Teacher!");
+                
+                if(doc.data().role === 'teacher') { showView('screen-teacher'); loadUserList(); }
+                else { 
+                    document.getElementById('user-display').innerText = doc.data().name;
+                    showView('screen-student'); 
+                    updateStats();
+                }
+            } catch(e) { alert(e.message); }
         }
 
         async function handleRegister() {
-            const n = document.getElementById('reg-name').value;
-            const e = document.getElementById('reg-email').value;
-            const p = document.getElementById('reg-password').value;
+            const n = document.getElementById('reg-name').value, e = document.getElementById('reg-email').value, p = document.getElementById('reg-pass').value;
             try {
                 const res = await auth.createUserWithEmailAndPassword(e, p);
-                await db.collection("users").doc(res.user.uid).set({ name: n, role: 'student' });
-                alert("Account Created!"); location.reload();
-            } catch(err) { alert(err.message); }
+                await db.collection("users").doc(res.user.uid).set({ name: n, role: 'student', status: 'active' });
+                location.reload();
+            } catch(e) { alert(e.message); }
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
 
-        // 5. QUIZ FLOW LOGIC
+        // QUIZ LOGIC (The Smart Timer)
         async function startQuizFlow() {
             const snap = await db.collection("questions").orderBy("time", "desc").limit(10).get();
-            questions = snap.docs.map(doc => doc.data());
-            if(questions.length === 0) return alert("No questions found! Contact teacher.");
-            
-            currentIndex = 0;
-            userAnswers = {};
+            quiz.data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if(quiz.data.length === 0) return alert("No questions found.");
+            quiz.cur = 0; quiz.answers = {};
             showView('screen-quiz');
-            loadQuestion();
+            loadQ();
         }
 
-        function loadQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('q-image').src = q.img;
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            
-            // Reset Smart Timer
-            attempt = 1;
-            timeLeft = 60;
-            startSmartTimer();
+        function loadQ() {
+            const q = quiz.data[quiz.cur];
+            document.getElementById('q-img').src = q.img;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            quiz.att = 1; quiz.time = 60;
+            runTimer();
         }
 
-        function startSmartTimer() {
-            clearInterval(timer);
-            document.getElementById('attempt-tag').innerText = "Attempt " + attempt;
-            document.getElementById('submit-ans-btn').disabled = (attempt > 1 && attempt < 3); // Based on your logic
+        function runTimer() {
+            clearInterval(quiz.timer);
+            document.getElementById('att-text').innerText = "Attempt " + quiz.att;
+            document.getElementById('sub-btn').disabled = (quiz.att === 2);
 
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-box').innerText = timeLeft + "s";
-                
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    if(attempt === 1) { 
-                        attempt = 2; timeLeft = 50; 
-                        document.getElementById('submit-ans-btn').disabled = true; // Lock answer
-                        startSmartTimer(); 
-                    }
-                    else if(attempt === 2) { 
-                        attempt = 3; timeLeft = 40; 
-                        document.getElementById('submit-ans-btn').disabled = false; // Final window
-                        startSmartTimer(); 
-                    }
-                    else { nextQ(); } // Auto-skip if time ends
+            quiz.timer = setInterval(() => {
+                quiz.time--;
+                document.getElementById('timer-txt').innerText = quiz.time + "s";
+                if(quiz.time <= 0) {
+                    if(quiz.att === 1) { quiz.att = 2; quiz.time = 50; runTimer(); }
+                    else if(quiz.att === 2) { quiz.att = 3; quiz.time = 40; runTimer(); }
+                    else { nextQ(); }
                 }
             }, 1000);
         }
 
-        function selectOpt(choice) {
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            event.target.classList.add('selected');
-            userAnswers[currentIndex] = { choice: choice, correct: (choice === questions[currentIndex].ans) };
+        function pick(c) {
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            quiz.answers[quiz.cur] = c;
         }
 
-        function submitAnswer() {
-            if(!userAnswers[currentIndex]) return alert("Select an option!");
-            clearInterval(timer);
+        async function submitQ() {
+            const q = quiz.data[quiz.cur];
+            if(!quiz.answers[quiz.cur]) return alert("Pick an option");
+            
+            if(quiz.answers[quiz.cur] !== q.ans) {
+                // Save to Error Vault
+                await db.collection("users").doc(auth.currentUser.uid).collection("vault").doc(q.id).set(q);
+            }
             nextQ();
         }
 
-        function nextQ() {
-            if(currentIndex < questions.length - 1) {
-                currentIndex++;
-                loadQuestion();
-            } else {
-                endQuiz();
-            }
+        function nextQ() { 
+            if(quiz.cur < quiz.data.length - 1) { quiz.cur++; loadQ(); } 
+            else { finishQuiz(); }
         }
 
-        function prevQ() {
-            if(currentIndex > 0) {
-                currentIndex--;
-                loadQuestion();
-            }
-        }
-
-        function endQuiz() {
-            clearInterval(timer);
-            let correct = 0;
-            Object.values(userAnswers).forEach(a => { if(a.correct) correct++; });
+        function finishQuiz() {
+            clearInterval(quiz.timer);
+            let score = 0;
+            Object.keys(quiz.answers).forEach(k => { if(quiz.answers[k] === quiz.data[k].ans) score++; });
             
-            document.getElementById('res-score').innerText = correct;
-            document.getElementById('res-correct').innerText = correct + "/" + questions.length;
-            document.getElementById('res-acc').innerText = Math.round((correct/questions.length)*100) + "%";
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-detail').innerText = score + "/" + quiz.data.length;
+            document.getElementById('res-acc').innerText = Math.round((score/quiz.data.length)*100) + "%";
+            document.getElementById('res-wrong').innerText = quiz.data.length - score;
             showView('screen-results');
         }
 
-        // 6. TEACHER LOGIC
-        function previewT(input) {
-            const reader = new FileReader();
-            reader.onload = e => { 
-                document.getElementById('t-preview').src = e.target.result; 
-                document.getElementById('t-preview').style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
+        // TEACHER & STATS
+        async function updateStats() {
+            const vSnap = await db.collection("users").doc(auth.currentUser.uid).collection("vault").get();
+            document.getElementById('stat-vault').innerText = vSnap.size;
+        }
+
+        function previewImg(i) {
+            const r = new FileReader();
+            r.onload = e => { document.getElementById('t-pre').src = e.target.result; document.getElementById('t-pre').style.display = 'block'; };
+            r.readAsDataURL(i.files[0]);
         }
 
         async function uploadQ() {
-            const img = document.getElementById('t-preview').src;
-            const ans = document.getElementById('t-ans').value;
-            if(!img || !ans) return alert("Missing data");
+            const img = document.getElementById('t-pre').src, ans = document.getElementById('t-ans').value;
+            if(!img || !ans) return alert("Error");
             await db.collection("questions").add({ img, ans, time: new Date() });
             alert("Published!"); location.reload();
         }
+
+        async function loadUserList() {
+            const snap = await db.collection("users").where("role", "==", "student").get();
+            const div = document.getElementById('user-list'); div.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                div.innerHTML += `<div class="user-row"><span>${u.name}</span> <button onclick="toggleU('${doc.id}', '${u.status}')">${u.status === 'blocked' ? 'Unblock' : 'Block'}</button></div>`;
+            });
+        }
     </script>
 </body>
-                    </html>
-                    
+    </html>
+    
