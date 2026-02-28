@@ -17,17 +17,33 @@ const questions = [
   }
 ];
 
+// ===== ATTEMPT SYSTEM =====
+let attemptCount = localStorage.getItem("quizAttempt");
+if (!attemptCount) {
+  attemptCount = 1;
+  localStorage.setItem("quizAttempt", 1);
+} else {
+  attemptCount = parseInt(attemptCount);
+}
+
 // ===== VARIABLES =====
 let currentQuestionIndex = 0;
 let userAnswers = [];
-
-let timeLeft = 60;
+let timeLeft;
 let timerInterval;
 
 const questionEl = document.getElementById("question");
 const optionsEl = document.getElementById("options");
 const resultEl = document.getElementById("result");
 const timerEl = document.getElementById("timer");
+
+// ===== GET TIME BASED ON ATTEMPT =====
+function getTimeForAttempt() {
+  if (attemptCount === 1) return 60;
+  if (attemptCount === 2) return 50;
+  if (attemptCount === 3) return 40;
+  return 30;
+}
 
 // ===== LOAD QUESTION =====
 function loadQuestion() {
@@ -58,7 +74,7 @@ function loadQuestion() {
 
 // ===== TIMER FUNCTION =====
 function startTimer() {
-  timeLeft = 60;
+  timeLeft = getTimeForAttempt();
   timerEl.textContent = timeLeft;
 
   timerInterval = setInterval(() => {
@@ -116,14 +132,27 @@ document.getElementById("submitBtn").onclick = () => {
   let accuracy = ((correct / total) * 100).toFixed(2);
 
   resultEl.innerHTML = `
+    <h3>Attempt: ${attemptCount}</h3>
     Total: ${total} <br>
     Attempted: ${attempted} <br>
     Skipped: ${skipped} <br>
     Correct: ${correct} <br>
     Incorrect: ${incorrect} <br>
-    Accuracy: ${accuracy}%
+    Accuracy: ${accuracy}% <br><br>
+    <button onclick="reattemptQuiz()">Reattempt</button>
   `;
 };
+
+// ===== REATTEMPT FUNCTION =====
+function reattemptQuiz() {
+  attemptCount++;
+  localStorage.setItem("quizAttempt", attemptCount);
+
+  currentQuestionIndex = 0;
+  userAnswers = [];
+  resultEl.innerHTML = "";
+  loadQuestion();
+}
 
 // ===== INITIAL LOAD =====
 loadQuestion();
