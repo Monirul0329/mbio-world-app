@@ -1,29 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>mBio World</title>
-    <link rel="stylesheet" href="style.css">
+  <title>mBio Quiz</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="authSection">
-    <h2>mBio World Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-</div>
+  <div class="quiz-container">
+    <h2 id="question">Question text</h2>
 
-<div id="studentDashboard" class="hidden">
-    <h2>Student Dashboard</h2>
-    <div id="quizList"></div>
-</div>
+    <div id="options"></div>
 
-<div id="teacherDashboard" class="hidden">
-    <h2>Teacher Dashboard</h2>
-    <input type="text" id="quizTitle" placeholder="Quiz Title">
-    <button onclick="createQuiz()">Create Quiz</button>
-</div>
+    <div class="buttons">
+      <button id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
+      <button id="submitBtn">Submit Quiz</button>
+    </div>
+  </div>
 
-<script type="module" src="app.js"></script>
+  <div id="result" class="result-box"></div>
+
+  <script src="script.js"></script>
 </body>
 </html>
