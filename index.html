@@ -1,164 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mBio World Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
-    <style>
-        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); }
-        .view { display: none; padding: 20px; }
-        .active { display: block; }
-        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; }
-        .btn-p { background: var(--p); }
-        .btn-s { background: var(--s); }
-        .ch-item { border-left: 5px solid var(--p); padding-left: 10px; margin-bottom: 20px; }
-    </style>
+    <title>mBio World</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <section id="view-login" class="view active">
-        <div class="card" style="max-width:400px; margin: 100px auto; text-align:center;">
-            <h1 style="color:var(--p)">mBio World</h1>
-            <input type="email" id="l-email" placeholder="Email">
-            <input type="password" id="l-pass" placeholder="Password">
-            <button class="btn btn-p" onclick="doLogin()">LOGIN</button>
-            <p id="error-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
-        </div>
-    </section>
+<div id="authSection">
+    <h2>mBio World Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+</div>
 
-    <section id="view-teacher" class="view">
-        <h2>Teacher Panel <button onclick="location.reload()">Logout</button></h2>
-        <div class="card">
-            <h3>1. Create Chapter (with PDF)</h3>
-            <input type="text" id="new-ch-name" placeholder="Chapter Name">
-            <input type="text" id="new-ch-pdf" placeholder="NCERT PDF Link">
-            <button class="btn btn-p" onclick="addCH()">Save Chapter</button>
-        </div>
-        <div class="card">
-            <h3>2. Add Topic & Quiz (JPEG)</h3>
-            <select id="ch-list-drop"></select>
-            <input type="text" id="new-top-name" placeholder="Topic Name">
-            <input type="file" accept="image/*" id="top-img-input">
-            <input type="text" id="new-top-ans" placeholder="Correct Answer (A/B/C/D)">
-            <button class="btn btn-s" onclick="addTOP()">Add Topic & Quiz</button>
-        </div>
-    </section>
+<div id="studentDashboard" class="hidden">
+    <h2>Student Dashboard</h2>
+    <div id="quizList"></div>
+</div>
 
-    <section id="view-student" class="view">
-        <h2>Biology Hub <button onclick="location.reload()">Logout</button></h2>
-        <div id="student-content"></div>
-    </section>
+<div id="teacherDashboard" class="hidden">
+    <h2>Teacher Dashboard</h2>
+    <input type="text" id="quizTitle" placeholder="Quiz Title">
+    <button onclick="createQuiz()">Create Quiz</button>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
-            authDomain: "mbio-world.firebaseapp.com",
-            projectId: "mbio-world",
-            storageBucket: "mbio-world.firebasestorage.app",
-            messagingSenderId: "423038302215",
-            appId: "1:423038302215:web:6d241c7e89af55a2fdd2a2"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        function switchView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        async function doLogin() {
-            const e = document.getElementById('l-email').value;
-            const p = document.getElementById('l-pass').value;
-            const err = document.getElementById('error-msg');
-            err.innerText = "Checking...";
-
-            try {
-                const res = await auth.signInWithEmailAndPassword(e, p);
-                const doc = await db.collection("users").doc(res.user.uid).get();
-                
-                if(!doc.exists) {
-                    err.innerText = "Logged in, but no Role found in Firestore 'users' collection!";
-                    return;
-                }
-
-                if(doc.data().role === 'teacher') {
-                    switchView('view-teacher');
-                    loadTeacher();
-                } else {
-                    switchView('view-student');
-                    loadStudent();
-                }
-            } catch(e) { err.innerText = e.message; }
-        }
-
-        // --- TEACHER LOGIC ---
-        async function addCH() {
-            const name = document.getElementById('new-ch-name').value;
-            const pdf = document.getElementById('new-ch-pdf').value;
-            await db.collection("chapters").add({ name, pdf });
-            alert("Chapter Added!");
-            loadTeacher();
-        }
-
-        async function addTOP() {
-            const chId = document.getElementById('ch-list-drop').value;
-            const name = document.getElementById('new-top-name').value;
-            const ans = document.getElementById('new-top-ans').value;
-            const file = document.getElementById('top-img-input').files[0];
-            
-            if(!file) return alert("Select an image first!");
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                await db.collection("chapters").doc(chId).collection("topics").add({
-                    name, ans, img: e.target.result
-                });
-                alert("Topic Added!");
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function loadTeacher() {
-            const snap = await db.collection("chapters").get();
-            const drop = document.getElementById('ch-list-drop');
-            drop.innerHTML = "";
-            snap.forEach(doc => drop.innerHTML += `<option value="${doc.id}">${doc.data().name}</option>`);
-        }
-
-        // --- STUDENT LOGIC ---
-        async function loadStudent() {
-            const snap = await db.collection("chapters").get();
-            const cont = document.getElementById('student-content');
-            cont.innerHTML = "";
-            
-            for(const chDoc of snap.docs) {
-                const ch = chDoc.data();
-                const topicsSnap = await db.collection("chapters").doc(chDoc.id).collection("topics").get();
-                let topList = "";
-                topicsSnap.forEach(t => {
-                    topList += `<div style="padding:10px; background:#eee; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between;">
-                        ${t.data().name} <button onclick="alert('Open Quiz')">Quiz</button>
-                    </div>`;
-                });
-
-                cont.innerHTML += `
-                <div class="card ch-item">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${ch.name}</b>
-                        <a href="${ch.pdf}" target="_blank" style="color:var(--s)">NCERT PDF</a>
-                    </div>
-                    ${topList}
-                </div>`;
-            }
-        }
-    </script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
