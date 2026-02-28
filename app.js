@@ -1,4 +1,4 @@
-let purchased = false
+let purchased = localStorage.getItem("purchased") === "true"
 let questions = JSON.parse(localStorage.getItem("questions")) || [
 {
 q:"Cell is unit of?",
@@ -23,6 +23,10 @@ ${purchased ? "Purchased ✅" : "<button onclick='buy()'>Buy Course</button>"}
 }
 
 function buy(){
+purchased = true
+localStorage.setItem("purchased","true")
+home()
+  }
 purchased = true
 home()
 }
