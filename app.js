@@ -26,9 +26,6 @@ function buy(){
 purchased = true
 localStorage.setItem("purchased","true")
 home()
-  }
-purchased = true
-home()
 }
 
 function practice(){
