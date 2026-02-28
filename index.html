@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>mBio World Pro | NEET Biology</title>
+    <title>mBio World Pro | Master Version</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -12,35 +13,37 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --p: #00b894; --s: #0984e3; --bg: #f0f3f5; --w: #ffffff; --err: #ff7675; }
+        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; --w: #ffffff; --err: #ff7675; }
         body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: #2d3436; }
         .view { display: none; min-height: 100vh; width: 100%; }
         .view.active { display: block; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .hidden { display: none !important; }
-
-        /* Professional UI */
-        .nav { background: var(--w); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); sticky: top; }
-        .card { background: var(--w); padding: 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+        
+        /* Elements */
+        .card { background: var(--w); padding: 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; font-size: 16px; }
         .btn-p { background: var(--p); color: white; }
-        .btn-s { background: var(--s); color: white; margin-top: 10px; }
-        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; }
-
-        /* Student List Styling */
-        .chapter-box { border-left: 5px solid var(--p); }
-        .topic-pill { background: #eef2f3; padding: 10px; border-radius: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .btn-s { background: var(--s); color: white; }
+        input, select { width: 100%; padding: 15px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        .nav { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        /* Hierarchy Styling */
+        .chapter-title { color: var(--p); font-weight: 800; border-left: 5px solid var(--p); padding-left: 10px; margin-bottom: 15px; }
+        .topic-row { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .pdf-link { color: var(--s); text-decoration: none; font-weight: 700; font-size: 13px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <section id="screen-auth" class="view active" style="display:flex; align-items:center; justify-content:center; background:var(--p);">
         <div class="card" style="width:85%; text-align:center;">
-            <h1 style="color:var(--p); margin:0;">mBio World</h1>
-            <p>Target NEET Biology</p>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="pass" placeholder="Password">
-            <button class="btn btn-p" onclick="login()">Login</button>
+            <h1 style="color:var(--p); margin:0; font-weight:800;">mBio World</h1>
+            <p>Complete NEET Biology Platform</p>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn btn-p" onclick="handleLogin()">LOGIN</button>
+            <p style="font-size: 12px; margin-top: 15px; color: #888;">Note: Teacher must set your role in Database.</p>
         </div>
     </section>
 
@@ -48,43 +51,41 @@
         <div class="nav"><b>Teacher Panel</b> <button onclick="logout()">Logout</button></div>
         <div class="container">
             <div class="card">
-                <h3>Step 1: Create Chapter</h3>
-                <input type="text" id="ch-name" placeholder="Chapter Name (e.g., Cell Biology)">
-                <input type="text" id="ch-pdf" placeholder="NCERT PDF URL (Google Drive/Web)">
-                <button class="btn btn-p" onclick="saveChapter()">Save Chapter & PDF</button>
+                <h3><i class="fas fa-folder-plus"></i> 1. Create Chapter</h3>
+                <input type="text" id="ch-name" placeholder="Chapter Name (e.g. Plant Kingdom)">
+                <input type="text" id="ch-pdf" placeholder="NCERT PDF Google Drive Link">
+                <button class="btn btn-p" onclick="saveChapter()">SAVE CHAPTER</button>
             </div>
 
-            <div id="topic-creator" class="card hidden">
-                <h3>Step 2: Add Topic to <span id="active-ch-name" style="color:var(--s)"></span></h3>
-                <input type="text" id="top-name" placeholder="Topic Name (e.g., Mitosis)">
-                <p style="font-size:12px; margin-bottom:5px;">Upload Question Image:</p>
-                <input type="file" id="top-img" accept="image/*" onchange="preview(this)">
-                <img id="pre-v" style="width:100%; border-radius:10px; display:none; margin:10px 0;">
+            <div class="card">
+                <h3><i class="fas fa-plus-circle"></i> 2. Add Topic & Quiz</h3>
+                <select id="ch-select-dropdown"><option>Select Chapter</option></select>
+                <input type="text" id="top-name" placeholder="Topic Name (e.g. Algae)">
+                <p style="font-size:12px; margin: 5px 0;">Upload Question JPEG:</p>
+                <input type="file" accept="image/*" onchange="previewImage(this)">
+                <img id="img-preview" style="width:100%; border-radius:10px; display:none; margin:10px 0;">
                 <input type="text" id="top-ans" placeholder="Correct Answer (A/B/C/D)">
-                <button class="btn btn-s" onclick="saveTopic()">Add Topic & Quiz</button>
-                <button class="btn" onclick="closeTopicEditor()" style="margin-top:5px; background:none; color:gray;">Finish Chapter</button>
+                <button class="btn btn-s" onclick="saveTopic()">ADD TOPIC & QUIZ</button>
             </div>
 
-            <h3 style="margin-top:20px;">Existing Chapters</h3>
-            <div id="ch-list-teacher"></div>
+            <h3>Existing Content Structure</h3>
+            <div id="teacher-structure"></div>
         </div>
     </section>
 
     <section id="screen-student" class="view">
-        <div class="nav"><b>Learning Hub</b> <button onclick="logout()">Logout</button></div>
+        <div class="nav"><b>mBio World Student</b> <button onclick="logout()">Logout</button></div>
         <div class="container">
-            <div class="card" style="background:var(--p); color:white;">
-                <h2 style="margin:0;" id="st-welcome">Welcome!</h2>
-                <p style="opacity:0.9;">Master NCERT Biology Chapter-wise</p>
+            <div class="card" style="background:var(--p); color:white; border-radius: 25px;">
+                <h2 style="margin:0;">Biology Library</h2>
+                <p style="opacity:0.9;">Select a chapter to begin</p>
             </div>
-            
-            <h3>Your Course</h3>
-            <div id="ch-list-student"></div>
+            <div id="student-structure"></div>
         </div>
     </section>
 
     <script>
-        // CONFIG
+        // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
             authDomain: "mbio-world.firebaseapp.com",
@@ -97,9 +98,10 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentEditingCh = null;
+        // Global Image Holder
+        let currentImageBase64 = "";
 
-        // VIEWS
+        // --- NAVIGATION ---
         function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             const target = document.getElementById(id);
@@ -107,86 +109,115 @@
             target.style.display = (id === 'screen-auth') ? 'flex' : 'block';
         }
 
-        // LOGIN
-        async function login() {
-            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
+        // --- AUTH LOGIC (MICRO-CHECKED) ---
+        async function handleLogin() {
+            const e = document.getElementById('login-email').value;
+            const p = document.getElementById('login-pass').value;
+            if(!e || !p) return alert("Fill Email and Password!");
+
             try {
                 const res = await auth.signInWithEmailAndPassword(e, p);
                 const doc = await db.collection("users").doc(res.user.uid).get();
-                if(doc.data().role === 'teacher') { showView('screen-teacher'); loadTeacherData(); }
-                else { 
-                    document.getElementById('st-welcome').innerText = "Hello, " + doc.data().name;
-                    showView('screen-student'); 
-                    loadStudentData(); 
+                
+                if(!doc.exists) {
+                    // Fallback: If teacher hasn't created user doc yet, create as student
+                    await db.collection("users").doc(res.user.uid).set({ role: 'student', status: 'active' });
+                    showView('screen-student');
+                    loadStudentContent();
+                } else {
+                    const data = doc.data();
+                    if(data.status === 'blocked') return alert("Your account is blocked!");
+                    if(data.role === 'teacher') {
+                        showView('screen-teacher');
+                        loadTeacherContent();
+                    } else {
+                        showView('screen-student');
+                        loadStudentContent();
+                    }
                 }
-            } catch(err) { alert(err.message); }
+            } catch(err) { alert("Login Failed: " + err.message); }
         }
 
-        // --- TEACHER LOGIC ---
+        // --- TEACHER ACTIONS ---
         async function saveChapter() {
-            const name = document.getElementById('ch-name').value, pdf = document.getElementById('ch-pdf').value;
-            if(!name) return alert("Enter Chapter Name");
-            const docRef = await db.collection("chapters").add({ name, pdf, timestamp: new Date() });
-            alert("Chapter Created! Now add topics.");
-            currentEditingCh = docRef.id;
-            document.getElementById('active-ch-name').innerText = name;
-            document.getElementById('topic-creator').classList.remove('hidden');
-            loadTeacherData();
+            const name = document.getElementById('ch-name').value;
+            const pdf = document.getElementById('ch-pdf').value;
+            if(!name) return alert("Chapter Name Required!");
+            await db.collection("chapters").add({ name, pdf, date: new Date() });
+            alert("Chapter Created!");
+            loadTeacherContent();
         }
 
-        function preview(input) {
-            const r = new FileReader();
-            r.onload = e => { document.getElementById('pre-v').src = e.target.result; document.getElementById('pre-v').style.display = 'block'; };
-            r.readAsDataURL(input.files[0]);
+        function previewImage(input) {
+            const reader = new FileReader();
+            reader.onload = e => { 
+                currentImageBase64 = e.target.result;
+                document.getElementById('img-preview').src = e.target.result;
+                document.getElementById('img-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
         }
 
         async function saveTopic() {
-            const name = document.getElementById('top-name').value, img = document.getElementById('pre-v').src, ans = document.getElementById('top-ans').value;
-            if(!name || !img || !ans) return alert("Missing Topic Info");
-            await db.collection("chapters").doc(currentEditingCh).collection("topics").add({ name, img, ans });
-            alert("Topic Added!");
-            document.getElementById('top-name').value = ""; document.getElementById('pre-v').style.display = 'none';
+            const chId = document.getElementById('ch-select-dropdown').value;
+            const name = document.getElementById('top-name').value;
+            const ans = document.getElementById('top-ans').value;
+            if(!chId || !name || !currentImageBase64 || !ans) return alert("Fill All Fields!");
+
+            await db.collection("chapters").doc(chId).collection("topics").add({
+                name: name,
+                img: currentImageBase64,
+                ans: ans.toUpperCase()
+            });
+            alert("Topic & Quiz Linked Successfully!");
+            loadTeacherContent();
         }
 
-        function closeTopicEditor() { document.getElementById('topic-creator').classList.add('hidden'); currentEditingCh = null; }
-
-        async function loadTeacherData() {
+        // --- DATA LOADERS ---
+        async function loadTeacherContent() {
             const snap = await db.collection("chapters").get();
-            const list = document.getElementById('ch-list-teacher');
-            list.innerHTML = "";
+            const list = document.getElementById('teacher-structure');
+            const drop = document.getElementById('ch-select-dropdown');
+            list.innerHTML = ""; drop.innerHTML = '<option value="">Select Chapter</option>';
+            
             snap.forEach(doc => {
-                list.innerHTML += `<div class="card chapter-box"><b>${doc.data().name}</b> <button onclick="editTopics('${doc.id}', '${doc.data().name}')" style="float:right; border:none; color:var(--s); background:none;">Add Topic</button></div>`;
+                const ch = doc.data();
+                drop.innerHTML += `<option value="${doc.id}">${ch.name}</option>`;
+                list.innerHTML += `<div class="card"><b>${ch.name}</b></div>`;
             });
         }
 
-        function editTopics(id, name) { currentEditingCh = id; document.getElementById('active-ch-name').innerText = name; document.getElementById('topic-creator').classList.remove('hidden'); }
-
-        // --- STUDENT LOGIC ---
-        async function loadStudentData() {
+        async function loadStudentContent() {
             const snap = await db.collection("chapters").get();
-            const list = document.getElementById('ch-list-student');
+            const list = document.getElementById('student-structure');
             list.innerHTML = "";
-            for (const doc of snap.docs) {
-                const ch = doc.data();
-                const topicsSnap = await db.collection("chapters").doc(doc.id).collection("topics").get();
+            
+            for(const chDoc of snap.docs) {
+                const ch = chDoc.data();
+                const topicsSnap = await db.collection("chapters").doc(chDoc.id).collection("topics").get();
                 let topicsHTML = "";
-                topicsSnap.forEach(t => {
-                    topicsHTML += `<div class="topic-pill"><span>${t.data().name}</span> <button onclick="alert('Starting Quiz...')" style="border:none; color:var(--p); background:none; font-weight:700;">QUIZ</button></div>`;
+                
+                topicsSnap.forEach(tDoc => {
+                    const t = tDoc.data();
+                    topicsHTML += `
+                    <div class="topic-row">
+                        <span>${t.name}</span>
+                        <button onclick="alert('Starting Quiz for ${t.name}')" style="background:var(--p); color:white; border:none; padding:5px 10px; border-radius:5px;">QUIZ</button>
+                    </div>`;
                 });
 
                 list.innerHTML += `
-                    <div class="card chapter-box">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="margin:0; color:var(--p);">${ch.name}</h3>
-                            <a href="${ch.pdf}" target="_blank" style="font-size:12px; font-weight:700; color:var(--s); text-decoration:none;"><i class="fas fa-file-pdf"></i> NCERT PDF</a>
-                        </div>
-                        <div style="margin-top:10px;">${topicsHTML}</div>
-                    </div>`;
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 class="chapter-title" style="margin:0;">${ch.name}</h3>
+                        <a href="${ch.pdf}" target="_blank" class="pdf-link"><i class="fas fa-file-pdf"></i> NCERT PDF</a>
+                    </div>
+                    <div style="margin-top:15px;">${topicsHTML}</div>
+                </div>`;
             }
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
     </script>
 </body>
-                </html>
-                    
+</html>
