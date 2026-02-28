@@ -1,3 +1,5 @@
+let timeLeft = 60;
+let timerInterval;
 const questions = [
   {
     question: "Cell is the unit of?",
