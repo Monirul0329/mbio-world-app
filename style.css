@@ -1,102 +1,38 @@
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#00b894,#00cec9);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-.quiz-container {
-  background: white;
-  width: 95%;
-  max-width: 500px;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  width:90%;
+  max-width:350px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.2);
+  text-align:center;
 }
 
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-weight: bold;
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
 
-.timer-box {
-  .timer-box {
-  background: #ff7675;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
+button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:#00b894;
+  color:white;
+  font-size:16px;
 }
-
-h2 {
-  margin: 15px 0;
-}
-
-.options-box button {
-  width: 100%;
-  margin: 6px 0;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background: #f2f2f2;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.options-box button:hover {
-  background: #dbe9ff;
-}
-
-.selected {
-  background: #5dade2 !important; /* soft blue */
-  color: white;
-}
-}
-
-.primary-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.nav-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.secondary-btn {
-  width: 48%;
-  padding: 10px;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 10px;
-}
-
-.result-box {
-  background: white;
-  width: 95%;
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-}
-
