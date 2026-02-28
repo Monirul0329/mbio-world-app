@@ -29,6 +29,8 @@ if (!attemptCount) {
 // ===== VARIABLES =====
 let currentQuestionIndex = 0;
 let userAnswers = [];
+let answerStatus = [];
+
 let timeLeft;
 let timerInterval;
 
@@ -61,8 +63,14 @@ function loadQuestion() {
       btn.classList.add("selected");
     }
 
+    if (answerStatus[currentQuestionIndex] === "submitted") {
+      btn.disabled = true;
+    }
+
     btn.onclick = () => {
+      if (answerStatus[currentQuestionIndex] === "submitted") return;
       userAnswers[currentQuestionIndex] = index;
+      answerStatus[currentQuestionIndex] = "selected";
       loadQuestion();
     };
 
@@ -74,6 +82,8 @@ function loadQuestion() {
 
 // ===== TIMER FUNCTION =====
 function startTimer() {
+  if (answerStatus[currentQuestionIndex] === "submitted") return;
+
   timeLeft = getTimeForAttempt();
   timerEl.textContent = timeLeft;
 
@@ -83,13 +93,14 @@ function startTimer() {
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      disableOptions();
+      lockAnswer();
     }
   }, 1000);
 }
 
-// ===== DISABLE OPTIONS =====
-function disableOptions() {
+// ===== LOCK ANSWER =====
+function lockAnswer() {
+  answerStatus[currentQuestionIndex] = "submitted";
   const buttons = optionsEl.querySelectorAll("button");
   buttons.forEach(btn => {
     btn.disabled = true;
@@ -97,8 +108,25 @@ function disableOptions() {
   });
 }
 
+// ===== ANSWER SUBMIT BUTTON =====
+const answerBtn = document.createElement("button");
+answerBtn.textContent = "Submit Answer";
+answerBtn.onclick = () => {
+  if (answerStatus[currentQuestionIndex] !== "selected") {
+    alert("Select an option first!");
+    return;
+  }
+  clearInterval(timerInterval);
+  lockAnswer();
+};
+document.querySelector(".quiz-container").appendChild(answerBtn);
+
 // ===== NEXT BUTTON =====
 document.getElementById("nextBtn").onclick = () => {
+  if (answerStatus[currentQuestionIndex] !== "submitted") {
+    alert("Please submit answer first!");
+    return;
+  }
   if (currentQuestionIndex < questions.length - 1) {
     currentQuestionIndex++;
     loadQuestion();
@@ -113,7 +141,7 @@ document.getElementById("prevBtn").onclick = () => {
   }
 };
 
-// ===== SUBMIT QUIZ =====
+// ===== FINAL QUIZ SUBMIT =====
 document.getElementById("submitBtn").onclick = () => {
   clearInterval(timerInterval);
 
@@ -126,7 +154,7 @@ document.getElementById("submitBtn").onclick = () => {
   });
 
   let total = questions.length;
-  let attempted = userAnswers.filter(a => a !== undefined).length;
+  let attempted = answerStatus.filter(s => s === "submitted").length;
   let skipped = total - attempted;
   let incorrect = attempted - correct;
   let accuracy = ((correct / total) * 100).toFixed(2);
@@ -143,13 +171,14 @@ document.getElementById("submitBtn").onclick = () => {
   `;
 };
 
-// ===== REATTEMPT FUNCTION =====
+// ===== REATTEMPT =====
 function reattemptQuiz() {
   attemptCount++;
   localStorage.setItem("quizAttempt", attemptCount);
 
   currentQuestionIndex = 0;
   userAnswers = [];
+  answerStatus = [];
   resultEl.innerHTML = "";
   loadQuestion();
 }
