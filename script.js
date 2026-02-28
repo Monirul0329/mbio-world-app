@@ -101,13 +101,24 @@ function startTimer() {
 // ===== LOCK ANSWER =====
 function lockAnswer() {
   answerStatus[currentQuestionIndex] = "submitted";
+
   const buttons = optionsEl.querySelectorAll("button");
-  buttons.forEach(btn => {
+  const correctIndex = questions[currentQuestionIndex].correct;
+
+  buttons.forEach((btn, index) => {
     btn.disabled = true;
-    btn.style.background = "gray";
+
+    if (index === correctIndex) {
+      btn.style.background = "#2ecc71"; // soft green
+      btn.style.color = "white";
+    }
+
+    if (userAnswers[currentQuestionIndex] === index && index !== correctIndex) {
+      btn.style.background = "#e74c3c"; // soft red
+      btn.style.color = "white";
+    }
   });
 }
-
 const answerBtn = document.getElementById("answerBtn");
 
 answerBtn.onclick = () => {
