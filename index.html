@@ -2,90 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>mBio World Pro | Master Version</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mBio World Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; --w: #ffffff; --err: #ff7675; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: #2d3436; }
-        .view { display: none; min-height: 100vh; width: 100%; }
-        .view.active { display: block; }
-        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        
-        /* Elements */
-        .card { background: var(--w); padding: 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; font-size: 16px; }
-        .btn-p { background: var(--p); color: white; }
-        .btn-s { background: var(--s); color: white; }
-        input, select { width: 100%; padding: 15px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-        .nav { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        
-        /* Hierarchy Styling */
-        .chapter-title { color: var(--p); font-weight: 800; border-left: 5px solid var(--p); padding-left: 10px; margin-bottom: 15px; }
-        .topic-row { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
-        .pdf-link { color: var(--s); text-decoration: none; font-weight: 700; font-size: 13px; }
-        .hidden { display: none !important; }
+        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); }
+        .view { display: none; padding: 20px; }
+        .active { display: block; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; }
+        .btn-p { background: var(--p); }
+        .btn-s { background: var(--s); }
+        .ch-item { border-left: 5px solid var(--p); padding-left: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <section id="screen-auth" class="view active" style="display:flex; align-items:center; justify-content:center; background:var(--p);">
-        <div class="card" style="width:85%; text-align:center;">
-            <h1 style="color:var(--p); margin:0; font-weight:800;">mBio World</h1>
-            <p>Complete NEET Biology Platform</p>
-            <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button class="btn btn-p" onclick="handleLogin()">LOGIN</button>
-            <p style="font-size: 12px; margin-top: 15px; color: #888;">Note: Teacher must set your role in Database.</p>
+    <section id="view-login" class="view active">
+        <div class="card" style="max-width:400px; margin: 100px auto; text-align:center;">
+            <h1 style="color:var(--p)">mBio World</h1>
+            <input type="email" id="l-email" placeholder="Email">
+            <input type="password" id="l-pass" placeholder="Password">
+            <button class="btn btn-p" onclick="doLogin()">LOGIN</button>
+            <p id="error-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
         </div>
     </section>
 
-    <section id="screen-teacher" class="view">
-        <div class="nav"><b>Teacher Panel</b> <button onclick="logout()">Logout</button></div>
-        <div class="container">
-            <div class="card">
-                <h3><i class="fas fa-folder-plus"></i> 1. Create Chapter</h3>
-                <input type="text" id="ch-name" placeholder="Chapter Name (e.g. Plant Kingdom)">
-                <input type="text" id="ch-pdf" placeholder="NCERT PDF Google Drive Link">
-                <button class="btn btn-p" onclick="saveChapter()">SAVE CHAPTER</button>
-            </div>
-
-            <div class="card">
-                <h3><i class="fas fa-plus-circle"></i> 2. Add Topic & Quiz</h3>
-                <select id="ch-select-dropdown"><option>Select Chapter</option></select>
-                <input type="text" id="top-name" placeholder="Topic Name (e.g. Algae)">
-                <p style="font-size:12px; margin: 5px 0;">Upload Question JPEG:</p>
-                <input type="file" accept="image/*" onchange="previewImage(this)">
-                <img id="img-preview" style="width:100%; border-radius:10px; display:none; margin:10px 0;">
-                <input type="text" id="top-ans" placeholder="Correct Answer (A/B/C/D)">
-                <button class="btn btn-s" onclick="saveTopic()">ADD TOPIC & QUIZ</button>
-            </div>
-
-            <h3>Existing Content Structure</h3>
-            <div id="teacher-structure"></div>
+    <section id="view-teacher" class="view">
+        <h2>Teacher Panel <button onclick="location.reload()">Logout</button></h2>
+        <div class="card">
+            <h3>1. Create Chapter (with PDF)</h3>
+            <input type="text" id="new-ch-name" placeholder="Chapter Name">
+            <input type="text" id="new-ch-pdf" placeholder="NCERT PDF Link">
+            <button class="btn btn-p" onclick="addCH()">Save Chapter</button>
+        </div>
+        <div class="card">
+            <h3>2. Add Topic & Quiz (JPEG)</h3>
+            <select id="ch-list-drop"></select>
+            <input type="text" id="new-top-name" placeholder="Topic Name">
+            <input type="file" accept="image/*" id="top-img-input">
+            <input type="text" id="new-top-ans" placeholder="Correct Answer (A/B/C/D)">
+            <button class="btn btn-s" onclick="addTOP()">Add Topic & Quiz</button>
         </div>
     </section>
 
-    <section id="screen-student" class="view">
-        <div class="nav"><b>mBio World Student</b> <button onclick="logout()">Logout</button></div>
-        <div class="container">
-            <div class="card" style="background:var(--p); color:white; border-radius: 25px;">
-                <h2 style="margin:0;">Biology Library</h2>
-                <p style="opacity:0.9;">Select a chapter to begin</p>
-            </div>
-            <div id="student-structure"></div>
-        </div>
+    <section id="view-student" class="view">
+        <h2>Biology Hub <button onclick="location.reload()">Logout</button></h2>
+        <div id="student-content"></div>
     </section>
 
     <script>
-        // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
             authDomain: "mbio-world.firebaseapp.com",
@@ -98,126 +70,95 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Global Image Holder
-        let currentImageBase64 = "";
-
-        // --- NAVIGATION ---
-        function showView(id) {
+        function switchView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            const target = document.getElementById(id);
-            target.classList.add('active');
-            target.style.display = (id === 'screen-auth') ? 'flex' : 'block';
+            document.getElementById(id).classList.add('active');
         }
 
-        // --- AUTH LOGIC (MICRO-CHECKED) ---
-        async function handleLogin() {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
-            if(!e || !p) return alert("Fill Email and Password!");
+        async function doLogin() {
+            const e = document.getElementById('l-email').value;
+            const p = document.getElementById('l-pass').value;
+            const err = document.getElementById('error-msg');
+            err.innerText = "Checking...";
 
             try {
                 const res = await auth.signInWithEmailAndPassword(e, p);
                 const doc = await db.collection("users").doc(res.user.uid).get();
                 
                 if(!doc.exists) {
-                    // Fallback: If teacher hasn't created user doc yet, create as student
-                    await db.collection("users").doc(res.user.uid).set({ role: 'student', status: 'active' });
-                    showView('screen-student');
-                    loadStudentContent();
-                } else {
-                    const data = doc.data();
-                    if(data.status === 'blocked') return alert("Your account is blocked!");
-                    if(data.role === 'teacher') {
-                        showView('screen-teacher');
-                        loadTeacherContent();
-                    } else {
-                        showView('screen-student');
-                        loadStudentContent();
-                    }
+                    err.innerText = "Logged in, but no Role found in Firestore 'users' collection!";
+                    return;
                 }
-            } catch(err) { alert("Login Failed: " + err.message); }
+
+                if(doc.data().role === 'teacher') {
+                    switchView('view-teacher');
+                    loadTeacher();
+                } else {
+                    switchView('view-student');
+                    loadStudent();
+                }
+            } catch(e) { err.innerText = e.message; }
         }
 
-        // --- TEACHER ACTIONS ---
-        async function saveChapter() {
-            const name = document.getElementById('ch-name').value;
-            const pdf = document.getElementById('ch-pdf').value;
-            if(!name) return alert("Chapter Name Required!");
-            await db.collection("chapters").add({ name, pdf, date: new Date() });
-            alert("Chapter Created!");
-            loadTeacherContent();
+        // --- TEACHER LOGIC ---
+        async function addCH() {
+            const name = document.getElementById('new-ch-name').value;
+            const pdf = document.getElementById('new-ch-pdf').value;
+            await db.collection("chapters").add({ name, pdf });
+            alert("Chapter Added!");
+            loadTeacher();
         }
 
-        function previewImage(input) {
-            const reader = new FileReader();
-            reader.onload = e => { 
-                currentImageBase64 = e.target.result;
-                document.getElementById('img-preview').src = e.target.result;
-                document.getElementById('img-preview').style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        async function saveTopic() {
-            const chId = document.getElementById('ch-select-dropdown').value;
-            const name = document.getElementById('top-name').value;
-            const ans = document.getElementById('top-ans').value;
-            if(!chId || !name || !currentImageBase64 || !ans) return alert("Fill All Fields!");
-
-            await db.collection("chapters").doc(chId).collection("topics").add({
-                name: name,
-                img: currentImageBase64,
-                ans: ans.toUpperCase()
-            });
-            alert("Topic & Quiz Linked Successfully!");
-            loadTeacherContent();
-        }
-
-        // --- DATA LOADERS ---
-        async function loadTeacherContent() {
-            const snap = await db.collection("chapters").get();
-            const list = document.getElementById('teacher-structure');
-            const drop = document.getElementById('ch-select-dropdown');
-            list.innerHTML = ""; drop.innerHTML = '<option value="">Select Chapter</option>';
+        async function addTOP() {
+            const chId = document.getElementById('ch-list-drop').value;
+            const name = document.getElementById('new-top-name').value;
+            const ans = document.getElementById('new-top-ans').value;
+            const file = document.getElementById('top-img-input').files[0];
             
-            snap.forEach(doc => {
-                const ch = doc.data();
-                drop.innerHTML += `<option value="${doc.id}">${ch.name}</option>`;
-                list.innerHTML += `<div class="card"><b>${ch.name}</b></div>`;
-            });
+            if(!file) return alert("Select an image first!");
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                await db.collection("chapters").doc(chId).collection("topics").add({
+                    name, ans, img: e.target.result
+                });
+                alert("Topic Added!");
+            };
+            reader.readAsDataURL(file);
         }
 
-        async function loadStudentContent() {
+        async function loadTeacher() {
             const snap = await db.collection("chapters").get();
-            const list = document.getElementById('student-structure');
-            list.innerHTML = "";
+            const drop = document.getElementById('ch-list-drop');
+            drop.innerHTML = "";
+            snap.forEach(doc => drop.innerHTML += `<option value="${doc.id}">${doc.data().name}</option>`);
+        }
+
+        // --- STUDENT LOGIC ---
+        async function loadStudent() {
+            const snap = await db.collection("chapters").get();
+            const cont = document.getElementById('student-content');
+            cont.innerHTML = "";
             
             for(const chDoc of snap.docs) {
                 const ch = chDoc.data();
                 const topicsSnap = await db.collection("chapters").doc(chDoc.id).collection("topics").get();
-                let topicsHTML = "";
-                
-                topicsSnap.forEach(tDoc => {
-                    const t = tDoc.data();
-                    topicsHTML += `
-                    <div class="topic-row">
-                        <span>${t.name}</span>
-                        <button onclick="alert('Starting Quiz for ${t.name}')" style="background:var(--p); color:white; border:none; padding:5px 10px; border-radius:5px;">QUIZ</button>
+                let topList = "";
+                topicsSnap.forEach(t => {
+                    topList += `<div style="padding:10px; background:#eee; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between;">
+                        ${t.data().name} <button onclick="alert('Open Quiz')">Quiz</button>
                     </div>`;
                 });
 
-                list.innerHTML += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3 class="chapter-title" style="margin:0;">${ch.name}</h3>
-                        <a href="${ch.pdf}" target="_blank" class="pdf-link"><i class="fas fa-file-pdf"></i> NCERT PDF</a>
+                cont.innerHTML += `
+                <div class="card ch-item">
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${ch.name}</b>
+                        <a href="${ch.pdf}" target="_blank" style="color:var(--s)">NCERT PDF</a>
                     </div>
-                    <div style="margin-top:15px;">${topicsHTML}</div>
+                    ${topList}
                 </div>`;
             }
         }
-
-        function logout() { auth.signOut().then(() => location.reload()); }
     </script>
 </body>
 </html>
