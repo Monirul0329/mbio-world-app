@@ -8,7 +8,6 @@ body {
   background: white;
   width: 95%;
   max-width: 500px;
-  margin: 40px auto;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -22,7 +21,8 @@ body {
 }
 
 .timer-box {
-  background: #ff4d4d;
+  .timer-box {
+  background: #ff7675;
   color: white;
   padding: 5px 10px;
   border-radius: 8px;
@@ -48,8 +48,9 @@ h2 {
 }
 
 .selected {
-  background: #4CAF50 !important;
+  background: #5dade2 !important; /* soft blue */
   color: white;
+}
 }
 
 .primary-btn {
@@ -96,4 +97,10 @@ h2 {
   padding: 20px;
   border-radius: 15px;
   text-align: center;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
