@@ -163,6 +163,66 @@ document.getElementById("submitBtn").onclick = () => {
   });
 
   let total = questions.length;
+  let percentage = ((correct / total) * 100).toFixed(2);
+
+  // Example Topper Score
+  let topperScore = 90;
+
+  // Full screen result page
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(to right,#141e30,#243b55);
+      color:white;
+      text-align:center;
+      font-family:sans-serif;
+    ">
+      <h1>Exam Result</h1>
+
+      <h2 style="font-size:60px; margin:10px 0;">
+        ${correct}/${total}
+      </h2>
+
+      <h3 style="font-size:30px;">
+        ${percentage}%
+      </h3>
+
+      <div style="margin-top:20px; font-size:18px;">
+        <p>Correct: ${correct}</p>
+        <p>Incorrect: ${total - correct}</p>
+      </div>
+
+      <div style="margin-top:15px;">
+        <p>Topper Score: ${topperScore}%</p>
+        <p>
+          You are 
+          ${percentage >= topperScore ? 
+            '<span style="color:#00e676">Above Topper</span>' : 
+            '<span style="color:#ff5252">Below Topper</span>'}
+        </p>
+      </div>
+
+      <button onclick="location.reload()" 
+        style="
+          padding:15px 30px;
+          background:#00c853;
+          border:none;
+          border-radius:10px;
+          font-size:18px;
+          margin-top:25px;
+          cursor:pointer;
+        ">
+        Reattempt
+      </button>
+    </div>
+  `;
+};
+
+  let total = questions.length;
   let attempted = answerStatus.filter(s => s === "submitted").length;
   let skipped = total - attempted;
   let incorrect = attempted - correct;
