@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>mBio World</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mBio World</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="card">
-  <h2>Login</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
+<div class="app">
+
+<div class="header">mBio World</div>
+
+<div id="content" class="content"></div>
+
+<div class="bottom-nav">
+<button onclick="home()">Home</button>
+<button onclick="practice()">Practice</button>
+<button onclick="profile()">Profile</button>
 </div>
 
-<script type="module" src="js/auth.js"></script>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
