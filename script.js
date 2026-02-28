@@ -1,5 +1,4 @@
-let timeLeft = 60;
-let timerInterval;
+// ===== QUESTIONS =====
 const questions = [
   {
     question: "Cell is the unit of?",
@@ -18,14 +17,22 @@ const questions = [
   }
 ];
 
+// ===== VARIABLES =====
 let currentQuestionIndex = 0;
 let userAnswers = [];
+
+let timeLeft = 60;
+let timerInterval;
 
 const questionEl = document.getElementById("question");
 const optionsEl = document.getElementById("options");
 const resultEl = document.getElementById("result");
+const timerEl = document.getElementById("timer");
 
+// ===== LOAD QUESTION =====
 function loadQuestion() {
+  clearInterval(timerInterval);
+
   const current = questions[currentQuestionIndex];
   questionEl.textContent = current.question;
   optionsEl.innerHTML = "";
@@ -45,8 +52,36 @@ function loadQuestion() {
 
     optionsEl.appendChild(btn);
   });
+
+  startTimer();
 }
 
+// ===== TIMER FUNCTION =====
+function startTimer() {
+  timeLeft = 60;
+  timerEl.textContent = timeLeft;
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      disableOptions();
+    }
+  }, 1000);
+}
+
+// ===== DISABLE OPTIONS =====
+function disableOptions() {
+  const buttons = optionsEl.querySelectorAll("button");
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.background = "gray";
+  });
+}
+
+// ===== NEXT BUTTON =====
 document.getElementById("nextBtn").onclick = () => {
   if (currentQuestionIndex < questions.length - 1) {
     currentQuestionIndex++;
@@ -54,6 +89,7 @@ document.getElementById("nextBtn").onclick = () => {
   }
 };
 
+// ===== PREVIOUS BUTTON =====
 document.getElementById("prevBtn").onclick = () => {
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
@@ -61,7 +97,10 @@ document.getElementById("prevBtn").onclick = () => {
   }
 };
 
+// ===== SUBMIT QUIZ =====
 document.getElementById("submitBtn").onclick = () => {
+  clearInterval(timerInterval);
+
   let correct = 0;
 
   questions.forEach((q, index) => {
@@ -82,8 +121,9 @@ document.getElementById("submitBtn").onclick = () => {
     Skipped: ${skipped} <br>
     Correct: ${correct} <br>
     Incorrect: ${incorrect} <br>
-    Accuracy: ${accuracy}% 
+    Accuracy: ${accuracy}%
   `;
 };
 
+// ===== INITIAL LOAD =====
 loadQuestion();
