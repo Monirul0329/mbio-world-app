@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>mBio World Pro | Final NEET Edition</title>
-    
+    <title>mBio World | Advanced NEET Biology</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -13,153 +12,76 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; --w: #ffffff; --d: #2d3436; --err: #ff7675; --v: #fdcb6e; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: var(--d); -webkit-tap-highlight-color: transparent; }
+        :root { --p: #00b894; --s: #0984e3; --bg: #f4f7f6; --w: #ffffff; --err: #ff7675; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: #2d3436; }
         .view { display: none; min-height: 100vh; width: 100%; }
         .view.active { display: block; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .hidden { display: none !important; }
-
-        /* UI Elements */
-        .btn { border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; padding: 15px; font-size: 16px; }
-        .btn:active { transform: scale(0.98); }
-        .btn-p { background: var(--p); color: var(--w); width: 100%; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #dfe6e9; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-
-        /* Auth Screen */
-        #screen-auth { background: linear-gradient(135deg, var(--p), #00cec9); display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--w); padding: 40px 30px; border-radius: 30px; width: 85%; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-
-        /* Dashboard */
-        .nav { background: var(--w); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; }
-        .stat-card { background: var(--w); padding: 20px; border-radius: 20px; display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-item { background: var(--w); padding: 25px 10px; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .menu-item i { font-size: 28px; margin-bottom: 10px; display: block; }
-
-        /* Quiz Engine */
-        .timer-box { width: 70px; height: 70px; border: 5px solid var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; margin: 0 auto 15px; color: var(--p); }
-        .q-window { background: var(--w); border-radius: 20px; padding: 10px; border: 1px solid #eee; margin-bottom: 15px; }
-        .q-window img { width: 100%; border-radius: 15px; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt-btn { background: var(--w); border: 2px solid #eee; padding: 18px; border-radius: 15px; font-weight: 700; cursor: pointer; }
-        .opt-btn.active { border-color: var(--p); background: #e6fffb; }
-
-        /* Results */
-        .res-top { background: var(--p); color: var(--w); padding: 40px 20px; text-align: center; border-radius: 0 0 40px 40px; }
-        .score-circle { width: 100px; height: 100px; border: 6px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; margin: 15px auto; }
         
-        /* Teacher List */
-        .user-row { background: var(--w); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        /* Teacher Dashboard Specifics */
+        .admin-box { background: var(--w); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .list-item { background: var(--w); padding: 15px; border-radius: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--p); }
+        
+        /* Modern Elements */
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-p { background: var(--p); color: white; }
+        input, select { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #dfe6e9; border-radius: 12px; box-sizing: border-box; }
+        .nav { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-    <section id="screen-auth" class="view active">
-        <div class="auth-card">
-            <h1 style="color:var(--p); margin:0; font-weight:800;">mBio World</h1>
-            <p style="color:#636e72; margin-bottom:30px;">NEET Biology Excellence</p>
-            <div id="login-box">
-                <input type="email" id="email" placeholder="Email Address">
-                <input type="password" id="pass" placeholder="Password">
-                <button class="btn btn-p" onclick="handleLogin()">Login</button>
-                <p onclick="toggleAuth(true)" style="margin-top:20px; font-size:14px;">New Student? <b style="color:var(--p)">Register</b></p>
-            </div>
-            <div id="reg-box" class="hidden">
-                <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="email" id="reg-email" placeholder="Email Address">
-                <input type="password" id="reg-pass" placeholder="Create Password">
-                <button class="btn btn-p" onclick="handleRegister()">Create Account</button>
-                <p onclick="toggleAuth(false)" style="margin-top:20px; font-size:14px;">Back to Login</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="screen-student" class="view">
-        <div class="nav">
-            <span id="user-display" style="font-weight:700;">Student</span>
-            <button onclick="logout()" style="border:none; background:none; color:var(--err); font-weight:700;">LOGOUT</button>
-        </div>
-        <div class="container">
-            <div class="stat-card">
-                <div><small>Completion</small><h3 id="stat-comp">0%</h3></div>
-                <div style="width:1px; background:#eee;"></div>
-                <div><small>Error Vault</small><h3 id="stat-vault" style="color:var(--v);">0</h3></div>
-            </div>
-            <div class="menu-grid">
-                <div class="menu-item" onclick="alert('Loading NCERT...')">
-                    <i class="fas fa-book" style="color:var(--p)"></i><span>NCERT Books</span>
-                </div>
-                <div class="menu-item" onclick="startQuizFlow()">
-                    <i class="fas fa-vial" style="color:var(--s)"></i><span>Daily Quiz</span>
-                </div>
-                <div class="menu-item" onclick="showVault()">
-                    <i class="fas fa-history" style="color:var(--v)"></i><span>Error Vault</span>
-                </div>
-                <div class="menu-item" onclick="alert('Leaderboard Soon')">
-                    <i class="fas fa-trophy" style="color:#f1c40f"></i><span>Ranking</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="screen-quiz" class="view">
-        <div class="nav">
-            <button onclick="showView('screen-student')" style="border:none; background:none; font-size:18px;"><i class="fas fa-times"></i></button>
-            <span id="att-text" style="font-weight:700; color:var(--s);">Attempt 1</span>
-        </div>
-        <div class="container">
-            <div class="timer-box" id="timer-txt">60s</div>
-            <div class="q-window"><img id="q-img" src=""></div>
-            <div class="opt-grid">
-                <button class="opt-btn" onclick="pick('A')">A</button>
-                <button class="opt-btn" onclick="pick('B')">B</button>
-                <button class="opt-btn" onclick="pick('C')">C</button>
-                <button class="opt-btn" onclick="pick('D')">D</button>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn" style="flex:1; background:#ddd;" onclick="prevQ()">Prev</button>
-                <button id="sub-btn" class="btn btn-p" style="flex:2;" onclick="submitQ()">Submit</button>
-                <button class="btn" style="flex:1; background:#ddd;" onclick="nextQ()">Next</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="screen-results" class="view">
-        <div class="res-top">
-            <h2>Result Summary</h2>
-            <div class="score-circle" id="res-score">0</div>
-            <p>Score: <span id="res-detail">0/0</span></p>
-        </div>
-        <div class="container">
-            <div class="stat-card" style="margin-top:-30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-                <div><small>Accuracy</small><h4 id="res-acc" style="color:var(--s);">0%</h4></div>
-                <div><small>Incorrect</small><h4 id="res-wrong" style="color:var(--err);">0</h4></div>
-            </div>
-            <div class="menu-item" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-top:15px;">
-                <span>Topper Score</span><b id="topper-val" style="color:var(--p)">--</b>
-            </div>
-            <button class="btn btn-p" onclick="showView('screen-student')" style="margin-top:20px;">Back to Home</button>
+    <section id="screen-auth" class="view active" style="display:flex; align-items:center; justify-content:center; background:var(--p);">
+        <div class="container" style="background:white; border-radius:30px; padding:40px 30px; text-align:center; width:85%;">
+            <h1 style="color:var(--p); margin:0;">mBio World</h1>
+            <p>Enter your NEET Journey</p>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn btn-p" onclick="handleLogin()">Login Now</button>
+            <p onclick="showReg()" style="margin-top:20px; font-size:14px; cursor:pointer;">New? <b>Register</b></p>
         </div>
     </section>
 
     <section id="screen-teacher" class="view">
         <div class="nav"><b>Teacher Panel</b> <button onclick="logout()">Logout</button></div>
         <div class="container">
-            <div class="menu-item" style="padding:20px; text-align:left;">
-                <h3 style="margin-top:0;">Upload JPEG Question</h3>
-                <input type="file" accept="image/*" onchange="previewImg(this)">
-                <img id="t-pre" style="width:100%; border-radius:10px; display:none; margin:10px 0;">
-                <input type="text" id="t-ans" placeholder="Correct Answer (A/B/C/D)">
-                <button class="btn btn-p" onclick="uploadQ()">Publish Live</button>
+            <div class="admin-box">
+                <h3>1. Create Chapter</h3>
+                <input type="text" id="ch-name" placeholder="Chapter Name (e.g. Genetics)">
+                <input type="text" id="ch-pdf" placeholder="NCERT PDF Link (Google Drive/URL)">
+                <button class="btn btn-p" onclick="addChapter()">Add Chapter</button>
             </div>
-            <h3 style="margin-top:20px;">Student Access Control</h3>
-            <div id="user-list"></div>
+
+            <div class="admin-box">
+                <h3>2. Add Topic & Quiz</h3>
+                <select id="ch-selector"></select> <input type="text" id="topic-name" placeholder="Topic Name (e.g. Mendel's Laws)">
+                <p style="font-size:12px; color:gray;">Upload Question JPEG:</p>
+                <input type="file" id="q-file" accept="image/*" onchange="previewImg(this)">
+                <img id="q-preview" style="width:100%; display:none; margin:10px 0; border-radius:10px;">
+                <input type="text" id="q-ans" placeholder="Correct Answer (A/B/C/D)">
+                <button class="btn btn-p" style="background:var(--s);" onclick="addTopic()">Publish Topic & Quiz</button>
+            </div>
+            
+            <h3>Chapter List</h3>
+            <div id="teacher-ch-list"></div>
+        </div>
+    </section>
+
+    <section id="screen-student" class="view">
+        <div class="nav"><b>mBio World</b> <button onclick="logout()">Logout</button></div>
+        <div class="container">
+            <div style="background:var(--p); color:white; padding:20px; border-radius:20px; margin-bottom:20px;">
+                <h2 id="stu-name" style="margin:0;">Hello!</h2>
+                <p>Ready to master Biology today?</p>
+            </div>
+            
+            <h3>NCERT Chapters</h3>
+            <div id="student-ch-list"></div>
         </div>
     </section>
 
     <script>
-        // FIREBASE CONFIG
+        // FIREBASE SETUP
         const firebaseConfig = {
             apiKey: "AIzaSyA2AInXXuMjhhTgu6dQ438bfO7SIE0Twag",
             authDomain: "mbio-world.firebaseapp.com",
@@ -172,142 +94,101 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // GLOBAL APP STATE
-        let quiz = { data: [], cur: 0, answers: {}, timer: null, time: 60, att: 1 };
-
         function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            const target = document.getElementById(id);
+            target.classList.add('active');
+            target.style.display = (id === 'screen-auth') ? 'flex' : 'block';
         }
 
-        function toggleAuth(isReg) {
-            document.getElementById('login-box').classList.toggle('hidden', isReg);
-            document.getElementById('reg-box').classList.toggle('hidden', !isReg);
-        }
-
-        // AUTH ACTIONS
+        // --- LOGIN LOGIC ---
         async function handleLogin() {
             const e = document.getElementById('email').value, p = document.getElementById('pass').value;
             try {
                 const res = await auth.signInWithEmailAndPassword(e, p);
                 const doc = await db.collection("users").doc(res.user.uid).get();
-                if(doc.data().status === 'blocked') return alert("Access Denied by Teacher!");
+                if(!doc.exists) return alert("User data not found!");
                 
-                if(doc.data().role === 'teacher') { showView('screen-teacher'); loadUserList(); }
-                else { 
-                    document.getElementById('user-display').innerText = doc.data().name;
+                const data = doc.data();
+                if(data.status === 'blocked') return alert("Teacher has blocked your access!");
+                
+                if(data.role === 'teacher') { 
+                    showView('screen-teacher'); 
+                    loadTeacherContent(); 
+                } else { 
+                    document.getElementById('stu-name').innerText = "Hello, " + data.name;
                     showView('screen-student'); 
-                    updateStats();
+                    loadStudentContent();
                 }
-            } catch(e) { alert(e.message); }
+            } catch(err) { alert("Error: " + err.message); }
         }
 
-        async function handleRegister() {
-            const n = document.getElementById('reg-name').value, e = document.getElementById('reg-email').value, p = document.getElementById('reg-pass').value;
-            try {
-                const res = await auth.createUserWithEmailAndPassword(e, p);
-                await db.collection("users").doc(res.user.uid).set({ name: n, role: 'student', status: 'active' });
-                location.reload();
-            } catch(e) { alert(e.message); }
+        // --- TEACHER ACTIONS ---
+        async function addChapter() {
+            const name = document.getElementById('ch-name').value;
+            const pdf = document.getElementById('ch-pdf').value;
+            if(!name) return alert("Enter Chapter Name");
+            await db.collection("chapters").add({ name, pdf, time: new Date() });
+            alert("Chapter Created!");
+            loadTeacherContent();
+        }
+
+        function previewImg(input) {
+            const r = new FileReader();
+            r.onload = e => { 
+                document.getElementById('q-preview').src = e.target.result; 
+                document.getElementById('q-preview').style.display = 'block'; 
+            };
+            r.readAsDataURL(input.files[0]);
+        }
+
+        async function addTopic() {
+            const chId = document.getElementById('ch-selector').value;
+            const topic = document.getElementById('topic-name').value;
+            const img = document.getElementById('q-preview').src;
+            const ans = document.getElementById('q-ans').value;
+            
+            if(!chId || !topic || !img || !ans) return alert("Fill all Topic/Quiz details!");
+            
+            await db.collection("chapters").doc(chId).collection("topics").add({
+                name: topic, img, ans, time: new Date()
+            });
+            alert("Topic & Quiz Added!");
+        }
+
+        // --- DATA LOADING ---
+        async function loadTeacherContent() {
+            const snap = await db.collection("chapters").get();
+            const list = document.getElementById('teacher-ch-list');
+            const selector = document.getElementById('ch-selector');
+            list.innerHTML = ""; selector.innerHTML = "";
+            
+            snap.forEach(doc => {
+                const ch = doc.data();
+                selector.innerHTML += `<option value="${doc.id}">${ch.name}</option>`;
+                list.innerHTML += `<div class="list-item"><span>${ch.name}</span> <button onclick="deleteCh('${doc.id}')" style="color:red; border:none; background:none;">Delete</button></div>`;
+            });
+        }
+
+        async function loadStudentContent() {
+            const snap = await db.collection("chapters").get();
+            const list = document.getElementById('student-ch-list');
+            list.innerHTML = "";
+            
+            snap.forEach(doc => {
+                const ch = doc.data();
+                list.innerHTML += `
+                    <div class="admin-box" style="margin-bottom:15px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h4 style="margin:0;">${ch.name}</h4>
+                            <a href="${ch.pdf}" target="_blank" style="color:var(--s); text-decoration:none; font-weight:700;">READ PDF</a>
+                        </div>
+                        <button class="btn btn-p" style="margin-top:10px; font-size:12px; padding:8px;" onclick="openTopics('${doc.id}')">View Topics & Quizzes</button>
+                    </div>`;
+            });
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
-
-        // QUIZ LOGIC (The Smart Timer)
-        async function startQuizFlow() {
-            const snap = await db.collection("questions").orderBy("time", "desc").limit(10).get();
-            quiz.data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if(quiz.data.length === 0) return alert("No questions found.");
-            quiz.cur = 0; quiz.answers = {};
-            showView('screen-quiz');
-            loadQ();
-        }
-
-        function loadQ() {
-            const q = quiz.data[quiz.cur];
-            document.getElementById('q-img').src = q.img;
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-            quiz.att = 1; quiz.time = 60;
-            runTimer();
-        }
-
-        function runTimer() {
-            clearInterval(quiz.timer);
-            document.getElementById('att-text').innerText = "Attempt " + quiz.att;
-            document.getElementById('sub-btn').disabled = (quiz.att === 2);
-
-            quiz.timer = setInterval(() => {
-                quiz.time--;
-                document.getElementById('timer-txt').innerText = quiz.time + "s";
-                if(quiz.time <= 0) {
-                    if(quiz.att === 1) { quiz.att = 2; quiz.time = 50; runTimer(); }
-                    else if(quiz.att === 2) { quiz.att = 3; quiz.time = 40; runTimer(); }
-                    else { nextQ(); }
-                }
-            }, 1000);
-        }
-
-        function pick(c) {
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            quiz.answers[quiz.cur] = c;
-        }
-
-        async function submitQ() {
-            const q = quiz.data[quiz.cur];
-            if(!quiz.answers[quiz.cur]) return alert("Pick an option");
-            
-            if(quiz.answers[quiz.cur] !== q.ans) {
-                // Save to Error Vault
-                await db.collection("users").doc(auth.currentUser.uid).collection("vault").doc(q.id).set(q);
-            }
-            nextQ();
-        }
-
-        function nextQ() { 
-            if(quiz.cur < quiz.data.length - 1) { quiz.cur++; loadQ(); } 
-            else { finishQuiz(); }
-        }
-
-        function finishQuiz() {
-            clearInterval(quiz.timer);
-            let score = 0;
-            Object.keys(quiz.answers).forEach(k => { if(quiz.answers[k] === quiz.data[k].ans) score++; });
-            
-            document.getElementById('res-score').innerText = score;
-            document.getElementById('res-detail').innerText = score + "/" + quiz.data.length;
-            document.getElementById('res-acc').innerText = Math.round((score/quiz.data.length)*100) + "%";
-            document.getElementById('res-wrong').innerText = quiz.data.length - score;
-            showView('screen-results');
-        }
-
-        // TEACHER & STATS
-        async function updateStats() {
-            const vSnap = await db.collection("users").doc(auth.currentUser.uid).collection("vault").get();
-            document.getElementById('stat-vault').innerText = vSnap.size;
-        }
-
-        function previewImg(i) {
-            const r = new FileReader();
-            r.onload = e => { document.getElementById('t-pre').src = e.target.result; document.getElementById('t-pre').style.display = 'block'; };
-            r.readAsDataURL(i.files[0]);
-        }
-
-        async function uploadQ() {
-            const img = document.getElementById('t-pre').src, ans = document.getElementById('t-ans').value;
-            if(!img || !ans) return alert("Error");
-            await db.collection("questions").add({ img, ans, time: new Date() });
-            alert("Published!"); location.reload();
-        }
-
-        async function loadUserList() {
-            const snap = await db.collection("users").where("role", "==", "student").get();
-            const div = document.getElementById('user-list'); div.innerHTML = "";
-            snap.forEach(doc => {
-                const u = doc.data();
-                div.innerHTML += `<div class="user-row"><span>${u.name}</span> <button onclick="toggleU('${doc.id}', '${u.status}')">${u.status === 'blocked' ? 'Unblock' : 'Block'}</button></div>`;
-            });
-        }
     </script>
 </body>
     </html>
