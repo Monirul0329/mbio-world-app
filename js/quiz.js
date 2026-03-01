@@ -113,8 +113,6 @@ startTotalTimer();
 function showQuestion(){
 
 questionSubmitted = false;
-selectedOption = null;
-
 clearInterval(questionTimer);
 
 let q = questions[currentIndex];
@@ -124,18 +122,40 @@ document.getElementById("quizContainer").innerHTML="No Questions";
 return;
 }
 
+let correctIndex = parseInt(q.correctIndex);
+let selectedIndex = userAnswers[currentIndex];
+
 let html = `
 <div class="card">
 <h3>Q${currentIndex+1}. ${q.questionText}</h3>
 
-${q.options.map((opt,i)=>
-`<div class="option" onclick="selectAnswer(${i}, this)">
+${q.options.map((opt,i)=>{
+
+let bg = "#f1f1f1";
+let color = "black";
+
+if(selectedIndex !== undefined){
+if(i === correctIndex){
+bg = "#C8E6C9";   // soft green
+color = "#1B5E20";
+}
+if(i === selectedIndex && i !== correctIndex){
+bg = "#FFCDD2";   // soft red
+color = "#B71C1C";
+}
+}
+
+return `
+<div class="option" 
+style="background:${bg};color:${color}"
+onclick="selectAnswer(${i}, this)">
 ${opt}
-</div>`
-).join("")}
+</div>
+`;
+
+}).join("")}
 
 <button onclick="submitAnswer()">Submit Answer</button>
-
 <div id="solutionBox" style="display:none;margin-top:10px;"></div>
 </div>
 `;
@@ -145,21 +165,44 @@ document.getElementById("quizContainer").innerHTML = html;
 startQuestionTimer();
 }
 
-function selectAnswer(index, element){
+function submitAnswer(){
 
-if(questionSubmitted) return;
-
-selectedOption = element;
-userAnswers[currentIndex] = index;
-
-document.querySelectorAll(".option").forEach(opt=>{
-opt.style.background="#f1f1f1";
-opt.style.color="black";
-});
-
-element.style.background="#bbdefb";
+if(userAnswers[currentIndex] !== undefined){
+return; // already answered
 }
 
+if(selectedOption == null){
+alert("Select an answer first");
+return;
+}
+
+clearInterval(questionTimer);
+
+let q = questions[currentIndex];
+let correctIndex = parseInt(q.correctIndex);
+let selectedIndex = parseInt(userAnswers[currentIndex]);
+
+document.querySelectorAll(".option").forEach((opt,i)=>{
+
+if(i === correctIndex){
+opt.style.background="#C8E6C9";
+opt.style.color="#1B5E20";
+}
+
+if(i === selectedIndex && i !== correctIndex){
+opt.style.background="#FFCDD2";
+opt.style.color="#B71C1C";
+}
+
+opt.style.pointerEvents="none";
+});
+
+if(selectedIndex !== correctIndex){
+let box = document.getElementById("solutionBox");
+box.style.display="block";
+box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check Notes");
+}
+}
 
 function nextQuestion(){
 if(currentIndex < questions.lengthfunction submitAnswer(){
