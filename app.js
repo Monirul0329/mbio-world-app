@@ -1,3 +1,24 @@
+let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+function login(){
+
+let email = document.getElementById("email").value
+let role = document.getElementById("role").value
+
+if(!email){
+alert("Enter email")
+return
+}
+
+currentUser = { email: email, role: role }
+
+localStorage.setItem("currentUser", JSON.stringify(currentUser))
+
+if(role === "teacher"){
+window.location.href = "admin.html"
+}else{
+window.location.href = "app.html"
+}
+}
 let totalAttempts = localStorage.getItem("totalAttempts") || 0
 let totalCorrect = localStorage.getItem("totalCorrect") || 0
 let purchased = localStorage.getItem("purchased") === "true"
