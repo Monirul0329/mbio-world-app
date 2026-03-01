@@ -79,3 +79,37 @@ border-radius:8px;
 box-shadow:0 2px 8px rgba(0,0,0,0.1);
 color:#1b5e20;
 }
+.option{
+  padding:10px;
+  margin:8px 0;
+  background:#f1f1f1;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.option.correct{
+  background:#4CAF50;
+  color:white;
+}
+
+.option.wrong{
+  background:#f44336;
+  color:white;
+}
+
+#submitBtn{
+  margin-top:15px;
+  padding:10px;
+  width:100%;
+  background:#2196F3;
+  color:white;
+  border:none;
+  border-radius:8px;
+}
+
+#solutionBox{
+  margin-top:15px;
+  padding:10px;
+  background:#fff3cd;
+  border-radius:8px;
+  }
