@@ -48,32 +48,45 @@ Last Score: ${score}
 </div>`
 }
 
+home()
+let skipped = 0
+let wrong = 0
+let answers = []
+
 function startQuiz(){
 current = 0
 score = 0
+wrong = 0
+skipped = 0
+answers = []
 attempt = 1
 showQuestion()
 }
 
 function showQuestion(){
 clearInterval(timer)
-let q = questions[current]
 
+let q = questions[current]
 timeLeft = attempt===1?60:attempt===2?50:40
 
-document.getElementById("content").innerHTML =
-`<div class="card">
+document.getElementById("content").innerHTML = `
+<div class="card">
 <h4>Question ${current+1}/${questions.length}</h4>
 <p>${q.q}</p>
 <div id="opts"></div>
-<p>Time: <span id="time">${timeLeft}</span></p>
-<button onclick="submitAns()">Submit</button>
-</div>`
+
+<p>Time: <span id="time">${timeLeft}</span>s</p>
+
+<button onclick="prevQuestion()">Previous</button>
+<button onclick="nextQuestion()">Next</button>
+<button onclick="submitQuiz()">Submit Quiz</button>
+</div>
+`
 
 let optDiv = document.getElementById("opts")
 q.options.forEach((o,i)=>{
-optDiv.innerHTML +=
-`<div class="option">
+optDiv.innerHTML += `
+<div class="option">
 <input type="radio" name="opt" value="${i}"> ${o}
 </div>`
 })
@@ -84,58 +97,71 @@ startTimer()
 function startTimer(){
 timer = setInterval(()=>{
 timeLeft--
-document.getElementById("time").innerText=timeLeft
+document.getElementById("time").innerText = timeLeft
+
 if(timeLeft<=0){
 clearInterval(timer)
-submitAns(true)
+skipped++
+answers[current] = -1
+nextQuestion()
 }
 },1000)
 }
 
-function submitAns(timeout=false){
+function nextQuestion(){
 clearInterval(timer)
-let selected=document.querySelector("input[name='opt']:checked")
-let ans=timeout?-1: selected?parseInt(selected.value):-1
 
-if(ans===questions[current].answer) score++
+let selected = document.querySelector("input[name='opt']:checked")
+
+if(selected){
+answers[current] = parseInt(selected.value)
+}else{
+answers[current] = -1
+}
 
 current++
 
-if(current<questions.length){
+if(current < questions.length){
 showQuestion()
 }else{
-showResult()
+submitQuiz()
 }
 }
 
-function showResult(){
-let percent=(score/questions.length)*100
-document.getElementById("content").innerHTML=
-`<div class="card">
-<h3>Result</h3>
+function prevQuestion(){
+if(current>0){
+current--
+showQuestion()
+}
+}
+
+function submitQuiz(){
+clearInterval(timer)
+
+score = 0
+wrong = 0
+
+for(let i=0;i<questions.length;i++){
+if(answers[i] === questions[i].answer){
+score++
+}else if(answers[i] !== -1){
+wrong++
+}
+}
+
+let accuracy = (score/questions.length)*100
+
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h3>Quiz Result</h3>
 <p>Total: ${questions.length}</p>
 <p>Correct: ${score}</p>
-<p>Wrong: ${questions.length-score}</p>
-<p>Accuracy: ${percent.toFixed(2)}%</p>
-<button onclick="home()">Back</button>
-</div>`
-}
+<p>Wrong: ${wrong}</p>
+<p>Skipped: ${skipped}</p>
+<p>Accuracy: ${accuracy.toFixed(2)}%</p>
 
-function addQuestion(){
-let newQ={
-q:document.getElementById("q").value,
-options:[
-document.getElementById("o1").value,
-document.getElementById("o2").value,
-document.getElementById("o3").value,
-document.getElementById("o4").value
-],
-answer:parseInt(document.getElementById("ans").value)
+<button onclick="startQuiz()">Reattempt</button>
+<button onclick="home()">Back Home</button>
+</div>
+`
 }
-
-questions.push(newQ)
-localStorage.setItem("questions",JSON.stringify(questions))
-alert("Added")
-}
-
-home()
