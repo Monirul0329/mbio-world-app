@@ -4,7 +4,9 @@ loadCourses();
 }
 });
 
+// ======================
 // CREATE COURSE
+// ======================
 function createCourse(){
 const title = document.getElementById("courseTitle").value;
 const price = document.getElementById("coursePrice").value;
@@ -26,7 +28,9 @@ loadCourses();
 });
 }
 
+// ======================
 // LOAD COURSES
+// ======================
 function loadCourses(){
 db.collection("courses").get().then(snapshot=>{
 let html="<h3>Your Courses</h3>";
@@ -56,7 +60,9 @@ loadChapters(doc.id);
 });
 }
 
-// CREATE CHAPTER WITH ORDER
+// ======================
+// CREATE CHAPTER
+// ======================
 function createChapter(courseId){
 let title = document.getElementById("chap_"+courseId).value;
 
@@ -86,7 +92,9 @@ loadCourses();
 });
 }
 
-// LOAD CHAPTERS ORDERED
+// ======================
+// LOAD CHAPTERS
+// ======================
 function loadChapters(courseId){
 db.collection("courses")
 .doc(courseId)
@@ -124,7 +132,9 @@ loadTopics(courseId,doc.id);
 });
 }
 
-// CREATE TOPIC WITH ORDER
+// ======================
+// CREATE TOPIC
+// ======================
 function createTopic(courseId,chapterId){
 let title = document.getElementById("topic_"+chapterId).value;
 
@@ -158,7 +168,9 @@ loadCourses();
 });
 }
 
-// LOAD TOPICS ORDERED
+// ======================
+// LOAD TOPICS
+// ======================
 function loadTopics(courseId,chapterId){
 db.collection("courses")
 .doc(courseId)
@@ -186,11 +198,12 @@ html += `
 <input id="o3_${topicId}" placeholder="Option 3">
 <input id="o4_${topicId}" placeholder="Option 4">
 <input id="ans_${topicId}" placeholder="Correct Index (0-3)">
+<input id="sol_${topicId}" placeholder="Solution (optional)">
 
 <button onclick="addQuestion('${courseId}','${chapterId}','${topicId}')">
 Add Question
 </button>
-<input id="sol_${topicId}" placeholder="Solution (optional)">
+
 <div id="questionList_${topicId}"></div>
 </div>
 `;
@@ -203,10 +216,10 @@ document.getElementById("topicList_"+chapterId).innerHTML = html;
 });
 }
 
+// ======================
 // ADD QUESTION
+// ======================
 function addQuestion(courseId,chapterId,topicId){
-let sol = document.getElementById("sol_"+topicId).value;
-
 
 let q = document.getElementById("q_"+topicId).value;
 let o1 = document.getElementById("o1_"+topicId).value;
@@ -214,9 +227,10 @@ let o2 = document.getElementById("o2_"+topicId).value;
 let o3 = document.getElementById("o3_"+topicId).value;
 let o4 = document.getElementById("o4_"+topicId).value;
 let ans = parseInt(document.getElementById("ans_"+topicId).value);
+let sol = document.getElementById("sol_"+topicId).value;
 
-if(!q){
-alert("Enter Question");
+if(!q || isNaN(ans)){
+alert("Fill Question and Correct Index");
 return;
 }
 
@@ -233,13 +247,15 @@ options:[o1,o2,o3,o4],
 correctIndex:ans,
 solution:sol || ""
 })
-  .then(()=>{
+.then(()=>{
 alert("Question Added");
 loadCourses();
 });
 }
 
-// LOAD QUESTIONS
+// ======================
+// LOAD QUESTIONS (FIXED)
+// ======================
 function loadQuestions(courseId,chapterId,topicId){
 db.collection("courses")
 .doc(courseId)
@@ -266,18 +282,29 @@ html += `
 <p>4) ${data.options[3]}</p>
 <p>Correct: ${data.correctIndex+1}</p>
 
+<button onclick="editQuestion('${courseId}','${chapterId}','${topicId}','${doc.id}')">
+Edit
+</button>
+
 <button onclick="deleteQuestion('${courseId}','${chapterId}','${topicId}','${doc.id}')">
 Delete
 </button>
 </div>
 `;
-<button onclick="editQuestion('${courseId}','${chapterId}','${topicId}','${doc.id}')">
-Edit
-</button>
+
+qno++;
+});
+
+document.getElementById("questionList_"+topicId).innerHTML = html;
+});
+}
+
+// ======================
+// EDIT QUESTION
+// ======================
 function editQuestion(courseId,chapterId,topicId,questionId){
 
 let newQ = prompt("Enter new question text");
-
 if(!newQ) return;
 
 db.collection("courses")
@@ -290,19 +317,16 @@ db.collection("courses")
 .doc(questionId)
 .update({
 questionText:newQ
-}).then(()=>{
+})
+.then(()=>{
 alert("Updated");
 loadCourses();
 });
 }
-qno++;
-});
 
-document.getElementById("questionList_"+topicId).innerHTML = html;
-});
-}
-
+// ======================
 // DELETE QUESTION
+// ======================
 function deleteQuestion(courseId,chapterId,topicId,questionId){
 db.collection("courses")
 .doc(courseId)
@@ -317,4 +341,4 @@ db.collection("courses")
 alert("Deleted");
 loadCourses();
 });
-}
+  }
