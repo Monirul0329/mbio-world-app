@@ -6,10 +6,11 @@ let questionTimer;
 let totalTimer;
 
 let questionTimeLeft = 60;
-let totalTimeLeft = 300; // 5 minutes
+let totalTimeLeft = 0;
 
 let userId;
 let perQuestionTime = 60;
+
 
 auth.onAuthStateChanged(user=>{
 if(!user){
@@ -17,6 +18,7 @@ window.location.href="index.html";
 return;
 }
 
+userId = user.uid;   // FIXED
 loadQuiz();
 });
 
@@ -57,9 +59,50 @@ promises.push(p);
 });
 
 Promise.all(promises).then(()=>{
+setupAttemptAndTimers();   // IMPORTANT
+});
+
+});
+
+}
+
+
+function setupAttemptAndTimers(){
+
+let topicId = localStorage.getItem("activeTopic");
+
+db.collection("attempts")
+.doc(userId)
+.collection("topics")
+.doc(topicId)
+.get()
+.then(doc=>{
+
+let attemptCount = 1;
+
+if(doc.exists){
+attemptCount = doc.data().attemptCount + 1;
+}
+
+// Attempt Based Time Logic
+if(attemptCount == 1){
+perQuestionTime = 60;
+}
+else if(attemptCount == 2){
+perQuestionTime = 50;
+}
+else if(attemptCount == 3){
+perQuestionTime = 40;
+}
+else{
+perQuestionTime = 30;
+}
+
+questionTimeLeft = perQuestionTime;
+totalTimeLeft = questions.length * perQuestionTime;
+
 showQuestion();
 startTotalTimer();
-});
 
 });
 
@@ -124,6 +167,17 @@ function submitQuiz(){
 clearInterval(questionTimer);
 clearInterval(totalTimer);
 
+let topicId = localStorage.getItem("activeTopic");
+
+// Increment attempt count
+db.collection("attempts")
+.doc(userId)
+.collection("topics")
+.doc(topicId)
+.set({
+attemptCount: firebase.firestore.FieldValue.increment(1)
+},{merge:true});
+
 let score = 0;
 
 questions.forEach((q,i)=>{
@@ -165,7 +219,7 @@ submitQuiz();
 function startQuestionTimer(){
 
 clearInterval(questionTimer);
-questionTimeLeft = 60;
+questionTimeLeft = perQuestionTime;   // FIXED
 
 questionTimer = setInterval(()=>{
 
@@ -188,4 +242,4 @@ nextQuestion();
 
 },1000);
 
-                }
+  }
