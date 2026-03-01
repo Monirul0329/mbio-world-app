@@ -42,9 +42,62 @@ document.getElementById("courseContent").innerHTML = `
 `;
 });
 }
-
 function goTopicSection(){
-alert("Topic Wise Section Coming Next Phase");
+
+let courseId = localStorage.getItem("activeCourse");
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.get()
+.then(snapshot=>{
+
+let html = "<h3>Chapters</h3>";
+
+snapshot.forEach(doc=>{
+let chapterId = doc.id;
+let data = doc.data();
+
+html += `
+<div class="card">
+<h4>${data.title}</h4>
+<button onclick="openChapter('${chapterId}')">Open</button>
+</div>
+`;
+});
+
+document.getElementById("courseContent").innerHTML = html;
+});
+}
+
+function openChapter(chapterId){
+
+let courseId = localStorage.getItem("activeCourse");
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
+.get()
+.then(snapshot=>{
+
+let html = "<h3>Topics</h3>";
+
+snapshot.forEach(doc=>{
+let topicId = doc.id;
+let data = doc.data();
+
+html += `
+<div class="card">
+<h4>${data.title}</h4>
+<button onclick="openTopic('${topicId}')">Start Quiz</button>
+</div>
+`;
+});
+
+document.getElementById("courseContent").innerHTML = html;
+});
 }
 
 function goTypeSection(){
