@@ -1,3 +1,5 @@
+let totalAttempts = localStorage.getItem("totalAttempts") || 0
+let totalCorrect = localStorage.getItem("totalCorrect") || 0
 let purchased = localStorage.getItem("purchased") === "true"
 let questions = JSON.parse(localStorage.getItem("questions")) || [
 {
@@ -42,12 +44,18 @@ document.getElementById("content").innerHTML =
 }
 
 function profile(){
+
+let accuracyOverall = totalAttempts == 0 
+? 0 
+: ((totalCorrect/(totalAttempts*questions.length))*100)
+
 document.getElementById("content").innerHTML =
 `<div class="card">
-Last Score: ${score}
+<h3>Profile</h3>
+<p>Total Attempts: ${totalAttempts}</p>
+<p>Overall Accuracy: ${accuracyOverall.toFixed(2)}%</p>
 </div>`
 }
-
 home()
 let skipped = 0
 let wrong = 0
@@ -146,6 +154,11 @@ if(answers[i] === questions[i].answer){
 score++
 }else if(answers[i] !== -1){
 wrong++
+  totalAttempts++
+totalCorrect = parseInt(totalCorrect) + score
+
+localStorage.setItem("totalAttempts", totalAttempts)
+localStorage.setItem("totalCorrect", totalCorrect)
 }
 }
 
