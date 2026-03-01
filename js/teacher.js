@@ -153,3 +153,32 @@ ${data.title}
 document.getElementById("topicList_"+chapterId).innerHTML = html;
 });
   }
+function addQuestion(courseId,chapterId,topicId){
+
+let q = document.getElementById("q_"+topicId).value;
+let o1 = document.getElementById("o1_"+topicId).value;
+let o2 = document.getElementById("o2_"+topicId).value;
+let o3 = document.getElementById("o3_"+topicId).value;
+let o4 = document.getElementById("o4_"+topicId).value;
+let ans = parseInt(document.getElementById("ans_"+topicId).value);
+
+if(!q){
+alert("Enter Question");
+return;
+}
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
+.doc(topicId)
+.collection("quiz")
+.add({
+questionText:q,
+options:[o1,o2,o3,o4],
+correctIndex:ans
+}).then(()=>{
+alert("Question Added");
+});
+}
