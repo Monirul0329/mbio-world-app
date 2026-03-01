@@ -6,24 +6,38 @@ loadCourses(user.uid);
 
 function loadCourses(userId){
 
-db.collection("courses").get().then(snapshot=>{
+Promise.all([
+db.collection("courses").get(),
+db.collection("purchases").doc(userId).get()
+])
+.then(([courseSnap, purchaseSnap])=>{
+
+let purchased = purchaseSnap.exists ? purchaseSnap.data() : {};
 let html="";
 
-snapshot.forEach(doc=>{
+courseSnap.forEach(doc=>{
 let data = doc.data();
 let courseId = doc.id;
+
+let isBought = purchased[courseId] === true;
 
 html += `
 <div class="card">
 <h3>${data.title}</h3>
 <p>₹${data.price}</p>
 <p>${data.description}</p>
-<button onclick="buyCourse('${courseId}')">Buy</button>
+
+${isBought 
+? `<button onclick="openCourse('${courseId}')">Open Course</button>` 
+: `<button onclick="buyCourse('${courseId}')">Buy</button>`
+}
+
 </div>
 `;
 });
 
 document.getElementById("courseContainer").innerHTML = html;
+
 });
 }
 
@@ -37,5 +51,11 @@ db.collection("purchases")
 },{merge:true})
 .then(()=>{
 alert("Course Purchased");
+loadCourses(user.uid);
 });
+}
+
+function openCourse(courseId){
+localStorage.setItem("activeCourse", courseId);
+window.location.href="course.html";
 }
