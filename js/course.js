@@ -111,3 +111,9 @@ alert("NCERT Section Coming Next Phase");
 function goBack(){
 window.location.href="student.html";
 }
+function openTopic(topicId){
+
+localStorage.setItem("activeTopic", topicId);
+
+window.location.href="quiz.html";
+  }
