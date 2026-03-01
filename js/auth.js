@@ -47,3 +47,9 @@ window.location.href = "student.html";
 alert(error.message);
 });
 }
+
+function logout(){
+auth.signOut().then(()=>{
+window.location.href="index.html";
+});
+}
