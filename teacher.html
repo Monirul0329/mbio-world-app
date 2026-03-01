@@ -25,6 +25,15 @@ window.location.href="index.html";
 }
 });
 </script>
+<script src="js/teacher.js"></script>
+<h2>Teacher Dashboard</h2>
 
-</body>
+<input id="courseTitle" placeholder="Course Title"><br>
+<input id="coursePrice" placeholder="Price"><br>
+<textarea id="courseDesc" placeholder="Description"></textarea><br>
+
+<button onclick="createCourse()">Create Course</button>
+<button onclick="logout()">Logout</button>
+
+<div id="courseList"></div>
 </html>
