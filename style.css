@@ -113,3 +113,14 @@ color:#1b5e20;
   background:#fff3cd;
   border-radius:8px;
   }
+button{
+background:#E3F2FD;
+color:#0D47A1;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+}
+
+button:hover{
+background:#BBDEFB;
+  }
