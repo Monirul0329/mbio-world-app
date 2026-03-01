@@ -2,24 +2,27 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>mBio World</title>
+<title>Login</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app">
+<div class="header">mBio World Login</div>
 
-<div class="header">mBio World</div>
+<div class="content">
+<div class="card">
 
-<div id="content" class="content"></div>
+<input id="email" placeholder="Email">
+<input id="password" placeholder="Password">
 
-<div class="bottom-nav">
-<button onclick="console.log("Purchased status:", purchased)
-</button>
-<button onclick="practice()">Practice</button>
-<button onclick="profile()">Profile</button>
+<select id="role">
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+</select>
+
+<button onclick="login()">Login</button>
+
 </div>
-
 </div>
 
 <script src="app.js"></script>
