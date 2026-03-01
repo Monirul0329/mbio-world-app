@@ -38,6 +38,20 @@ return
 }
 
 document.getElementById("content").innerHTML =
+`
+<div class="card">
+<h3>Topic Wise</h3>
+<button onclick="startQuiz()">Cell Structure Quiz</button>
+</div>
+
+<div class="card">
+<h3>Chapter Wise</h3>
+<button onclick="startQuiz()">Chapter 1 Full Test</button>
+</div>
+`
+}
+
+document.getElementById("content").innerHTML =
 `<div class="card">
 <button onclick="startQuiz()">Start Quiz</button>
 </div>`
@@ -172,7 +186,19 @@ document.getElementById("content").innerHTML = `
 <p>Wrong: ${wrong}</p>
 <p>Skipped: ${skipped}</p>
 <p>Accuracy: ${accuracy.toFixed(2)}%</p>
+let leaderboard = [
+{ name:"Topper", score:questions.length },
+{ name:"You", score:score }
+]
 
+leaderboard.sort((a,b)=>b.score-a.score)
+
+document.getElementById("content").innerHTML += `
+<div class="card">
+<h3>Leaderboard</h3>
+${leaderboard.map(l=>`<p>${l.name} - ${l.score}</p>`).join("")}
+</div>
+`
 <button onclick="startQuiz()">Reattempt</button>
 <button onclick="home()">Back Home</button>
 </div>
