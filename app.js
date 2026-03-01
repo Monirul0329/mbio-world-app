@@ -1,3 +1,29 @@
+// ================= LOGIN SYSTEM =================
+
+function login(){
+
+let email = document.getElementById("email").value
+let role = document.getElementById("role").value
+
+if(!email){
+alert("Enter email")
+return
+}
+
+let currentUser = {
+email: email,
+role: role
+}
+
+localStorage.setItem("currentUser", JSON.stringify(currentUser))
+
+if(role === "teacher"){
+window.location.href = "admin.html"
+}else{
+window.location.href = "app.html"
+}
+
+}
 // ================= USER SYSTEM =================
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser"))
