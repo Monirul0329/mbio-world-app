@@ -159,7 +159,10 @@ opt.style.color="black";
 
 element.style.background="#bbdefb";
 }
-function submitAnswer(){
+
+
+function nextQuestion(){
+if(currentIndex < questions.lengthfunction submitAnswer(){
 
 if(questionSubmitted) return;
 
@@ -173,44 +176,37 @@ clearInterval(questionTimer);
 
 let q = questions[currentIndex];
 
-// 🔥 Force number
-let correctIndex = Number(q.correctIndex);
+// 🔥 force both to number
+let correctIndex = parseInt(q.correctIndex);
+let selectedIndex = parseInt(userAnswers[currentIndex]);
 
 document.querySelectorAll(".option").forEach((opt,i)=>{
 
 if(i === correctIndex){
-opt.style.background="#4CAF50";
-opt.style.color="white";
+opt.style.background="#A5D6A7";   // soft green
+opt.style.color="#1B5E20";
 }
 
-if(i === userAnswers[currentIndex] && i !== correctIndex){
-opt.style.background="#f44336";
-opt.style.color="white";
+if(i === selectedIndex && i !== correctIndex){
+opt.style.background="#FFCDD2";   // soft red
+opt.style.color="#B71C1C";
 }
 
 opt.style.pointerEvents="none";
 });
 
-if(userAnswers[currentIndex] !== correctIndex){
+if(selectedIndex !== correctIndex){
 let box = document.getElementById("solutionBox");
 box.style.display="block";
-box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check NCERT");
+box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check Notes");
 }
 }
-
-function nextQuestion(){
-if(currentIndex < questions.length-1){
+  -1){
 currentIndex++;
 showQuestion();
 }
 }
 
-function prevQuestion(){
-if(currentIndex > 0){
-currentIndex--;
-showQuestion();
-}
-}
 
 function submitQuiz(){
 
