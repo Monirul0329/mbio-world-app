@@ -46,11 +46,13 @@ html += `
 <div id="chapterList_${courseId}"></div>
 </div>
 `;
-
-loadChapters(courseId);
 });
 
 document.getElementById("courseList").innerHTML = html;
+
+snapshot.forEach(doc=>{
+loadChapters(doc.id);
+});
 });
 }
 
@@ -98,11 +100,13 @@ html += `
 <div id="topicList_${chapterId}"></div>
 </div>
 `;
-
-loadTopics(courseId,chapterId);
 });
 
 document.getElementById("chapterList_"+courseId).innerHTML = html;
+
+snapshot.forEach(doc=>{
+loadTopics(courseId,doc.id);
+});
 });
 }
 
@@ -141,30 +145,36 @@ db.collection("courses")
 let html="";
 
 snapshot.forEach(doc=>{
+let topicId = doc.id;
 let data = doc.data();
 
-  html += `
+html += `
 <div class="card">
 <h5>${data.title}</h5>
 
-<input id="q_${doc.id}" placeholder="Question">
-<input id="o1_${doc.id}" placeholder="Option 1">
-<input id="o2_${doc.id}" placeholder="Option 2">
-<input id="o3_${doc.id}" placeholder="Option 3">
-<input id="o4_${doc.id}" placeholder="Option 4">
-<input id="ans_${doc.id}" placeholder="Correct Index (0-3)">
+<input id="q_${topicId}" placeholder="Question">
+<input id="o1_${topicId}" placeholder="Option 1">
+<input id="o2_${topicId}" placeholder="Option 2">
+<input id="o3_${topicId}" placeholder="Option 3">
+<input id="o4_${topicId}" placeholder="Option 4">
+<input id="ans_${topicId}" placeholder="Correct Index (0-3)">
 
-<button onclick="addQuestion('${courseId}','${chapterId}','${doc.id}')">
+<button onclick="addQuestion('${courseId}','${chapterId}','${topicId}')">
 Add Question
 </button>
 
+<div id="questionList_${topicId}"></div>
 </div>
 `;
+
+loadQuestions(courseId,chapterId,topicId);
 });
 
 document.getElementById("topicList_"+chapterId).innerHTML = html;
 });
-  }
+}
+
+// ADD QUESTION
 function addQuestion(courseId,chapterId,topicId){
 
 let q = document.getElementById("q_"+topicId).value;
@@ -192,5 +202,60 @@ options:[o1,o2,o3,o4],
 correctIndex:ans
 }).then(()=>{
 alert("Question Added");
+loadCourses();
 });
 }
+
+// LOAD QUESTIONS
+function loadQuestions(courseId,chapterId,topicId){
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
+.doc(topicId)
+.collection("quiz")
+.get()
+.then(snapshot=>{
+
+let html="";
+
+snapshot.forEach(doc=>{
+let data = doc.data();
+
+html += `
+<div class="card">
+<p><b>${data.questionText}</b></p>
+<p>1) ${data.options[0]}</p>
+<p>2) ${data.options[1]}</p>
+<p>3) ${data.options[2]}</p>
+<p>4) ${data.options[3]}</p>
+<p>Correct: ${data.correctIndex+1}</p>
+
+<button onclick="deleteQuestion('${courseId}','${chapterId}','${topicId}','${doc.id}')">
+Delete
+</button>
+</div>
+`;
+});
+
+document.getElementById("questionList_"+topicId).innerHTML = html;
+});
+}
+
+// DELETE QUESTION
+function deleteQuestion(courseId,chapterId,topicId,questionId){
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
+.doc(topicId)
+.collection("quiz")
+.doc(questionId)
+.delete()
+.then(()=>{
+alert("Deleted");
+loadCourses();
+});
+      }
