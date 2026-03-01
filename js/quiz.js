@@ -11,9 +11,6 @@ let totalTimeLeft = 0;
 let userId;
 let perQuestionTime = 60;
 
-let selectedOption = null;
-let questionSubmitted = false;
-
 const POSITIVE_MARK = 4;
 const NEGATIVE_MARK = -1;
 
@@ -87,18 +84,10 @@ if(doc.exists){
 attemptCount = doc.data().attemptCount + 1;
 }
 
-if(attemptCount == 1){
-perQuestionTime = 60;
-}
-else if(attemptCount == 2){
-perQuestionTime = 50;
-}
-else if(attemptCount == 3){
-perQuestionTime = 40;
-}
-else{
-perQuestionTime = 30;
-}
+if(attemptCount == 1) perQuestionTime = 60;
+else if(attemptCount == 2) perQuestionTime = 50;
+else if(attemptCount == 3) perQuestionTime = 40;
+else perQuestionTime = 30;
 
 questionTimeLeft = perQuestionTime;
 totalTimeLeft = questions.length * perQuestionTime;
@@ -112,7 +101,6 @@ startTotalTimer();
 
 function showQuestion(){
 
-questionSubmitted = false;
 clearInterval(questionTimer);
 
 let q = questions[currentIndex];
@@ -122,33 +110,14 @@ document.getElementById("quizContainer").innerHTML="No Questions";
 return;
 }
 
-let correctIndex = parseInt(q.correctIndex);
-let selectedIndex = userAnswers[currentIndex];
-
 let html = `
 <div class="card">
 <h3>Q${currentIndex+1}. ${q.questionText}</h3>
 
 ${q.options.map((opt,i)=>{
 
-let bg = "#f1f1f1";
-let color = "black";
-
-if(selectedIndex !== undefined){
-if(i === correctIndex){
-bg = "#C8E6C9";   // soft green
-color = "#1B5E20";
-}
-if(i === selectedIndex && i !== correctIndex){
-bg = "#FFCDD2";   // soft red
-color = "#B71C1C";
-}
-}
-
 return `
-<div class="option" 
-style="background:${bg};color:${color}"
-onclick="selectAnswer(${i}, this)">
+<div class="option" onclick="selectAnswer(${i}, this)">
 ${opt}
 </div>
 `;
@@ -156,6 +125,8 @@ ${opt}
 }).join("")}
 
 <button onclick="submitAnswer()">Submit Answer</button>
+<button onclick="nextQuestion()">Next</button>
+
 <div id="solutionBox" style="display:none;margin-top:10px;"></div>
 </div>
 `;
@@ -165,13 +136,22 @@ document.getElementById("quizContainer").innerHTML = html;
 startQuestionTimer();
 }
 
-function submitAnswer(){
+function selectAnswer(index, element){
 
-if(userAnswers[currentIndex] !== undefined){
-return; // already answered
+if(userAnswers[currentIndex] !== undefined) return;
+
+userAnswers[currentIndex] = index;
+
+document.querySelectorAll(".option").forEach(opt=>{
+opt.style.border="2px solid #ccc";
+});
+
+element.style.border="2px solid #1b5e20";
 }
 
-if(selectedOption == null){
+function submitAnswer(){
+
+if(userAnswers[currentIndex] === undefined){
 alert("Select an answer first");
 return;
 }
@@ -205,51 +185,16 @@ box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check Notes");
 }
 
 function nextQuestion(){
-if(currentIndex < questions.lengthfunction submitAnswer(){
 
-if(questionSubmitted) return;
-
-if(selectedOption == null){
-alert("Select an answer first");
-return;
-}
-
-questionSubmitted = true;
-clearInterval(questionTimer);
-
-let q = questions[currentIndex];
-
-// 🔥 force both to number
-let correctIndex = parseInt(q.correctIndex);
-let selectedIndex = parseInt(userAnswers[currentIndex]);
-
-document.querySelectorAll(".option").forEach((opt,i)=>{
-
-if(i === correctIndex){
-opt.style.background="#A5D6A7";   // soft green
-opt.style.color="#1B5E20";
-}
-
-if(i === selectedIndex && i !== correctIndex){
-opt.style.background="#FFCDD2";   // soft red
-opt.style.color="#B71C1C";
-}
-
-opt.style.pointerEvents="none";
-});
-
-if(selectedIndex !== correctIndex){
-let box = document.getElementById("solutionBox");
-box.style.display="block";
-box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check Notes");
-}
-}
-  -1){
+if(currentIndex < questions.length - 1){
 currentIndex++;
 showQuestion();
 }
+else{
+submitQuiz();
 }
 
+}
 
 function submitQuiz(){
 
@@ -272,9 +217,7 @@ let wrong = 0;
 
 questions.forEach((q,i)=>{
 
-if(userAnswers[i] == undefined){
-return; // unattempted = 0
-}
+if(userAnswers[i] == undefined) return;
 
 if(userAnswers[i] == q.correctIndex){
 score += POSITIVE_MARK;
@@ -284,6 +227,7 @@ else{
 score += NEGATIVE_MARK;
 wrong++;
 }
+
 });
 
 alert(
@@ -308,7 +252,7 @@ let minutes = Math.floor(totalTimeLeft/60);
 let seconds = totalTimeLeft%60;
 
 document.getElementById("totalTimer").innerText =
-"Total Time: "+minutes+":"+ (seconds<10?"0":"")+seconds;
+"Total Time: "+minutes+":"+(seconds<10?"0":"")+seconds;
 
 if(totalTimeLeft <=0){
 clearInterval(totalTimer);
@@ -344,4 +288,4 @@ nextQuestion();
 }
 
 },1000);
-                                       }
+  }
