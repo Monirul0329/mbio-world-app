@@ -143,9 +143,21 @@ let html="";
 snapshot.forEach(doc=>{
 let data = doc.data();
 
-html += `
+  html += `
 <div class="card">
-${data.title}
+<h5>${data.title}</h5>
+
+<input id="q_${doc.id}" placeholder="Question">
+<input id="o1_${doc.id}" placeholder="Option 1">
+<input id="o2_${doc.id}" placeholder="Option 2">
+<input id="o3_${doc.id}" placeholder="Option 3">
+<input id="o4_${doc.id}" placeholder="Option 4">
+<input id="ans_${doc.id}" placeholder="Correct Index (0-3)">
+
+<button onclick="addQuestion('${courseId}','${chapterId}','${doc.id}')">
+Add Question
+</button>
+
 </div>
 `;
 });
