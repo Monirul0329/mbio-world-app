@@ -8,6 +8,8 @@ let totalTimer;
 let questionTimeLeft = 60;
 let totalTimeLeft = 300; // 5 minutes
 
+let userId;
+let perQuestionTime = 60;
 
 auth.onAuthStateChanged(user=>{
 if(!user){
