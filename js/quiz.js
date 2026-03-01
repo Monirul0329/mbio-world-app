@@ -2,6 +2,13 @@ let questions = [];
 let currentIndex = 0;
 let userAnswers = [];
 
+let questionTimer;
+let totalTimer;
+
+let questionTimeLeft = 60;
+let totalTimeLeft = 300; // 5 minutes
+
+
 auth.onAuthStateChanged(user=>{
 if(!user){
 window.location.href="index.html";
@@ -11,10 +18,13 @@ return;
 loadQuiz();
 });
 
+
 function loadQuiz(){
 
 let courseId = localStorage.getItem("activeCourse");
 let topicId = localStorage.getItem("activeTopic");
+
+questions = [];
 
 db.collection("courses")
 .doc(courseId)
@@ -22,8 +32,11 @@ db.collection("courses")
 .get()
 .then(chapterSnap=>{
 
+let promises = [];
+
 chapterSnap.forEach(chapDoc=>{
-db.collection("courses")
+
+let p = db.collection("courses")
 .doc(courseId)
 .collection("chapters")
 .doc(chapDoc.id)
@@ -35,12 +48,21 @@ db.collection("courses")
 snapshot.forEach(doc=>{
 questions.push(doc.data());
 });
-showQuestion();
 });
+
+promises.push(p);
+
+});
+
+Promise.all(promises).then(()=>{
+showQuestion();
+startTotalTimer();
 });
 
 });
+
 }
+
 
 function showQuestion(){
 
@@ -68,11 +90,16 @@ ${opt}
 `;
 
 document.getElementById("quizContainer").innerHTML = html;
+
+startQuestionTimer();
+
 }
+
 
 function selectAnswer(index){
 userAnswers[currentIndex] = index;
 }
+
 
 function nextQuestion(){
 if(currentIndex < questions.length-1){
@@ -81,6 +108,7 @@ showQuestion();
 }
 }
 
+
 function prevQuestion(){
 if(currentIndex > 0){
 currentIndex--;
@@ -88,7 +116,11 @@ showQuestion();
 }
 }
 
+
 function submitQuiz(){
+
+clearInterval(questionTimer);
+clearInterval(totalTimer);
 
 let score = 0;
 
@@ -100,4 +132,58 @@ score++;
 
 alert("Score: "+score+"/"+questions.length);
 window.location.href="course.html";
+
 }
+
+
+function startTotalTimer(){
+
+clearInterval(totalTimer);
+
+totalTimer = setInterval(()=>{
+
+totalTimeLeft--;
+
+let minutes = Math.floor(totalTimeLeft/60);
+let seconds = totalTimeLeft%60;
+
+document.getElementById("totalTimer").innerText =
+"Total Time: "+minutes+":"+ (seconds<10?"0":"")+seconds;
+
+if(totalTimeLeft <=0){
+clearInterval(totalTimer);
+submitQuiz();
+}
+
+},1000);
+
+}
+
+
+function startQuestionTimer(){
+
+clearInterval(questionTimer);
+questionTimeLeft = 60;
+
+questionTimer = setInterval(()=>{
+
+questionTimeLeft--;
+
+let timerEl = document.getElementById("questionTimer");
+
+timerEl.innerText = "Question Time: "+questionTimeLeft+"s";
+
+if(questionTimeLeft <=20){
+timerEl.style.color="red";
+}else{
+timerEl.style.color="#1b5e20";
+}
+
+if(questionTimeLeft <=0){
+clearInterval(questionTimer);
+nextQuestion();
+}
+
+},1000);
+
+                }
