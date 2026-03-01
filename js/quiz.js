@@ -11,6 +11,8 @@ let totalTimeLeft = 0;
 let userId;
 let perQuestionTime = 60;
 
+let selectedOption = null;
+let questionSubmitted = false;
 
 auth.onAuthStateChanged(user=>{
 if(!user){
@@ -18,10 +20,9 @@ window.location.href="index.html";
 return;
 }
 
-userId = user.uid;   // FIXED
+userId = user.uid;
 loadQuiz();
 });
-
 
 function loadQuiz(){
 
@@ -59,13 +60,12 @@ promises.push(p);
 });
 
 Promise.all(promises).then(()=>{
-setupAttemptAndTimers();   // IMPORTANT
+setupAttemptAndTimers();
 });
 
 });
 
 }
-
 
 function setupAttemptAndTimers(){
 
@@ -84,7 +84,6 @@ if(doc.exists){
 attemptCount = doc.data().attemptCount + 1;
 }
 
-// Attempt Based Time Logic
 if(attemptCount == 1){
 perQuestionTime = 60;
 }
@@ -108,8 +107,12 @@ startTotalTimer();
 
 }
 
-
 function showQuestion(){
+
+questionSubmitted = false;
+selectedOption = null;
+
+clearInterval(questionTimer);
 
 let q = questions[currentIndex];
 
@@ -123,13 +126,14 @@ let html = `
 <h3>${q.questionText}</h3>
 
 ${q.options.map((opt,i)=>
-`<div>
-<input type="radio" name="option" value="${i}"
-${userAnswers[currentIndex]==i?"checked":""}
-onclick="selectAnswer(${i})">
+`<div class="option" onclick="selectAnswer(${i}, this)">
 ${opt}
 </div>`
 ).join("")}
+
+<button onclick="submitAnswer()">Submit Answer</button>
+
+<div id="solutionBox" style="display:none;margin-top:10px;"></div>
 
 </div>
 `;
@@ -140,11 +144,57 @@ startQuestionTimer();
 
 }
 
+function selectAnswer(index, element){
 
-function selectAnswer(index){
+if(questionSubmitted) return;
+
+selectedOption = element;
 userAnswers[currentIndex] = index;
+
+document.querySelectorAll(".option").forEach(opt=>{
+opt.style.background="#f1f1f1";
+});
+
+element.style.background="#bbdefb";
 }
 
+function submitAnswer(){
+
+if(questionSubmitted) return;
+
+if(selectedOption == null){
+alert("Select an answer first");
+return;
+}
+
+questionSubmitted = true;
+clearInterval(questionTimer);
+
+let q = questions[currentIndex];
+
+document.querySelectorAll(".option").forEach((opt,i)=>{
+
+if(i == q.correctIndex){
+opt.style.background="#4CAF50";
+opt.style.color="white";
+}
+
+if(i == userAnswers[currentIndex] && i != q.correctIndex){
+opt.style.background="#f44336";
+opt.style.color="white";
+}
+
+opt.style.pointerEvents="none";
+
+});
+
+if(userAnswers[currentIndex] != q.correctIndex){
+let box = document.getElementById("solutionBox");
+box.style.display="block";
+box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check NCERT");
+}
+
+}
 
 function nextQuestion(){
 if(currentIndex < questions.length-1){
@@ -153,14 +203,12 @@ showQuestion();
 }
 }
 
-
 function prevQuestion(){
 if(currentIndex > 0){
 currentIndex--;
 showQuestion();
 }
 }
-
 
 function submitQuiz(){
 
@@ -169,7 +217,6 @@ clearInterval(totalTimer);
 
 let topicId = localStorage.getItem("activeTopic");
 
-// Increment attempt count
 db.collection("attempts")
 .doc(userId)
 .collection("topics")
@@ -190,7 +237,6 @@ alert("Score: "+score+"/"+questions.length);
 window.location.href="course.html";
 
 }
-
 
 function startTotalTimer(){
 
@@ -215,11 +261,11 @@ submitQuiz();
 
 }
 
-
 function startQuestionTimer(){
 
 clearInterval(questionTimer);
-questionTimeLeft = perQuestionTime;   // FIXED
+
+questionTimeLeft = perQuestionTime;
 
 questionTimer = setInterval(()=>{
 
@@ -242,4 +288,4 @@ nextQuestion();
 
 },1000);
 
-  }
+}
