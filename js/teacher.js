@@ -190,7 +190,7 @@ html += `
 <button onclick="addQuestion('${courseId}','${chapterId}','${topicId}')">
 Add Question
 </button>
-
+<input id="sol_${topicId}" placeholder="Solution (optional)">
 <div id="questionList_${topicId}"></div>
 </div>
 `;
@@ -205,6 +205,8 @@ document.getElementById("topicList_"+chapterId).innerHTML = html;
 
 // ADD QUESTION
 function addQuestion(courseId,chapterId,topicId){
+let sol = document.getElementById("sol_"+topicId).value;
+
 
 let q = document.getElementById("q_"+topicId).value;
 let o1 = document.getElementById("o1_"+topicId).value;
@@ -228,8 +230,10 @@ db.collection("courses")
 .add({
 questionText:q,
 options:[o1,o2,o3,o4],
-correctIndex:ans
-}).then(()=>{
+correctIndex:ans,
+solution:sol || ""
+})
+  .then(()=>{
 alert("Question Added");
 loadCourses();
 });
@@ -267,7 +271,30 @@ Delete
 </button>
 </div>
 `;
+<button onclick="editQuestion('${courseId}','${chapterId}','${topicId}','${doc.id}')">
+Edit
+</button>
+function editQuestion(courseId,chapterId,topicId,questionId){
 
+let newQ = prompt("Enter new question text");
+
+if(!newQ) return;
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
+.doc(topicId)
+.collection("quiz")
+.doc(questionId)
+.update({
+questionText:newQ
+}).then(()=>{
+alert("Updated");
+loadCourses();
+});
+}
 qno++;
 });
 
