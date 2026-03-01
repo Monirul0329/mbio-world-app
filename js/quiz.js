@@ -14,6 +14,9 @@ let perQuestionTime = 60;
 let selectedOption = null;
 let questionSubmitted = false;
 
+const POSITIVE_MARK = 4;
+const NEGATIVE_MARK = -1;
+
 auth.onAuthStateChanged(user=>{
 if(!user){
 window.location.href="index.html";
@@ -123,7 +126,7 @@ return;
 
 let html = `
 <div class="card">
-<h3>${q.questionText}</h3>
+<h3>Q${currentIndex+1}. ${q.questionText}</h3>
 
 ${q.options.map((opt,i)=>
 `<div class="option" onclick="selectAnswer(${i}, this)">
@@ -134,14 +137,12 @@ ${opt}
 <button onclick="submitAnswer()">Submit Answer</button>
 
 <div id="solutionBox" style="display:none;margin-top:10px;"></div>
-
 </div>
 `;
 
 document.getElementById("quizContainer").innerHTML = html;
 
 startQuestionTimer();
-
 }
 
 function selectAnswer(index, element){
@@ -153,6 +154,7 @@ userAnswers[currentIndex] = index;
 
 document.querySelectorAll(".option").forEach(opt=>{
 opt.style.background="#f1f1f1";
+opt.style.color="black";
 });
 
 element.style.background="#bbdefb";
@@ -185,7 +187,6 @@ opt.style.color="white";
 }
 
 opt.style.pointerEvents="none";
-
 });
 
 if(userAnswers[currentIndex] != q.correctIndex){
@@ -193,7 +194,6 @@ let box = document.getElementById("solutionBox");
 box.style.display="block";
 box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check NCERT");
 }
-
 }
 
 function nextQuestion(){
@@ -226,16 +226,33 @@ attemptCount: firebase.firestore.FieldValue.increment(1)
 },{merge:true});
 
 let score = 0;
+let correct = 0;
+let wrong = 0;
 
 questions.forEach((q,i)=>{
+
+if(userAnswers[i] == undefined){
+return; // unattempted = 0
+}
+
 if(userAnswers[i] == q.correctIndex){
-score++;
+score += POSITIVE_MARK;
+correct++;
+}
+else{
+score += NEGATIVE_MARK;
+wrong++;
 }
 });
 
-alert("Score: "+score+"/"+questions.length);
-window.location.href="course.html";
+alert(
+"Total Questions: "+questions.length+
+"\nCorrect: "+correct+
+"\nWrong: "+wrong+
+"\nFinal Score: "+score
+);
 
+window.location.href="course.html";
 }
 
 function startTotalTimer(){
@@ -258,7 +275,6 @@ submitQuiz();
 }
 
 },1000);
-
 }
 
 function startQuestionTimer(){
@@ -287,5 +303,4 @@ nextQuestion();
 }
 
 },1000);
-
-}
+                                       }
