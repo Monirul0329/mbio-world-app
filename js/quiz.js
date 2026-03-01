@@ -159,7 +159,6 @@ opt.style.color="black";
 
 element.style.background="#bbdefb";
 }
-
 function submitAnswer(){
 
 if(questionSubmitted) return;
@@ -174,14 +173,17 @@ clearInterval(questionTimer);
 
 let q = questions[currentIndex];
 
+// 🔥 Force number
+let correctIndex = Number(q.correctIndex);
+
 document.querySelectorAll(".option").forEach((opt,i)=>{
 
-if(i == q.correctIndex){
+if(i === correctIndex){
 opt.style.background="#4CAF50";
 opt.style.color="white";
 }
 
-if(i == userAnswers[currentIndex] && i != q.correctIndex){
+if(i === userAnswers[currentIndex] && i !== correctIndex){
 opt.style.background="#f44336";
 opt.style.color="white";
 }
@@ -189,7 +191,7 @@ opt.style.color="white";
 opt.style.pointerEvents="none";
 });
 
-if(userAnswers[currentIndex] != q.correctIndex){
+if(userAnswers[currentIndex] !== correctIndex){
 let box = document.getElementById("solutionBox");
 box.style.display="block";
 box.innerHTML = "<b>Solution:</b> " + (q.solution || "Check NCERT");
