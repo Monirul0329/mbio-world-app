@@ -56,7 +56,7 @@ loadChapters(doc.id);
 });
 }
 
-// CREATE CHAPTER
+// CREATE CHAPTER WITH ORDER
 function createChapter(courseId){
 let title = document.getElementById("chap_"+courseId).value;
 
@@ -68,23 +68,35 @@ return;
 db.collection("courses")
 .doc(courseId)
 .collection("chapters")
+.get()
+.then(snapshot=>{
+
+let order = snapshot.size + 1;
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
 .add({
-title:title
+title:title,
+order:order
 }).then(()=>{
 alert("Chapter Added");
 loadCourses();
 });
+});
 }
 
-// LOAD CHAPTERS
+// LOAD CHAPTERS ORDERED
 function loadChapters(courseId){
 db.collection("courses")
 .doc(courseId)
 .collection("chapters")
+.orderBy("order")
 .get()
 .then(snapshot=>{
 
 let html="";
+let count=1;
 
 snapshot.forEach(doc=>{
 let chapterId = doc.id;
@@ -92,7 +104,7 @@ let data = doc.data();
 
 html += `
 <div class="card">
-<h5>${data.title}</h5>
+<h5>Chapter ${count}: ${data.title}</h5>
 
 <input id="topic_${chapterId}" placeholder="Topic Title">
 <button onclick="createTopic('${courseId}','${chapterId}')">Add Topic</button>
@@ -100,6 +112,8 @@ html += `
 <div id="topicList_${chapterId}"></div>
 </div>
 `;
+
+count++;
 });
 
 document.getElementById("chapterList_"+courseId).innerHTML = html;
@@ -110,7 +124,7 @@ loadTopics(courseId,doc.id);
 });
 }
 
-// CREATE TOPIC
+// CREATE TOPIC WITH ORDER
 function createTopic(courseId,chapterId){
 let title = document.getElementById("topic_"+chapterId).value;
 
@@ -124,25 +138,39 @@ db.collection("courses")
 .collection("chapters")
 .doc(chapterId)
 .collection("topics")
+.get()
+.then(snapshot=>{
+
+let order = snapshot.size + 1;
+
+db.collection("courses")
+.doc(courseId)
+.collection("chapters")
+.doc(chapterId)
+.collection("topics")
 .add({
-title:title
+title:title,
+order:order
 }).then(()=>{
 alert("Topic Added");
 loadCourses();
 });
+});
 }
 
-// LOAD TOPICS
+// LOAD TOPICS ORDERED
 function loadTopics(courseId,chapterId){
 db.collection("courses")
 .doc(courseId)
 .collection("chapters")
 .doc(chapterId)
 .collection("topics")
+.orderBy("order")
 .get()
 .then(snapshot=>{
 
 let html="";
+let count=1;
 
 snapshot.forEach(doc=>{
 let topicId = doc.id;
@@ -150,7 +178,7 @@ let data = doc.data();
 
 html += `
 <div class="card">
-<h5>${data.title}</h5>
+<h5>Topic ${count}: ${data.title}</h5>
 
 <input id="q_${topicId}" placeholder="Question">
 <input id="o1_${topicId}" placeholder="Option 1">
@@ -168,6 +196,7 @@ Add Question
 `;
 
 loadQuestions(courseId,chapterId,topicId);
+count++;
 });
 
 document.getElementById("topicList_"+chapterId).innerHTML = html;
@@ -219,13 +248,14 @@ db.collection("courses")
 .then(snapshot=>{
 
 let html="";
+let qno=1;
 
 snapshot.forEach(doc=>{
 let data = doc.data();
 
 html += `
 <div class="card">
-<p><b>${data.questionText}</b></p>
+<p><b>Q${qno}. ${data.questionText}</b></p>
 <p>1) ${data.options[0]}</p>
 <p>2) ${data.options[1]}</p>
 <p>3) ${data.options[2]}</p>
@@ -237,6 +267,8 @@ Delete
 </button>
 </div>
 `;
+
+qno++;
 });
 
 document.getElementById("questionList_"+topicId).innerHTML = html;
@@ -258,4 +290,4 @@ db.collection("courses")
 alert("Deleted");
 loadCourses();
 });
-      }
+}
