@@ -1,28 +1,37 @@
+// ================= USER SYSTEM =================
+
 let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-function login(){
+let usersData = JSON.parse(localStorage.getItem("usersData")) || {}
 
-let email = document.getElementById("email").value
-let role = document.getElementById("role").value
-
-if(!email){
-alert("Enter email")
-return
+if(currentUser && !usersData[currentUser.email]){
+usersData[currentUser.email] = {
+purchased:false,
+attempts:0,
+correct:0
+}
+localStorage.setItem("usersData", JSON.stringify(usersData))
 }
 
-currentUser = { email: email, role: role }
-
-localStorage.setItem("currentUser", JSON.stringify(currentUser))
-
-if(role === "teacher"){
-window.location.href = "admin.html"
-}else{
-window.location.href = "app.html"
+function logout(){
+localStorage.removeItem("currentUser")
+window.location.href = "index.html"
 }
+
+// ================= COURSE SYSTEM =================
+
+function isPurchased(){
+return usersData[currentUser.email].purchased
 }
-let totalAttempts = localStorage.getItem("totalAttempts") || 0
-let totalCorrect = localStorage.getItem("totalCorrect") || 0
-let purchased = localStorage.getItem("purchased") === "true"
-let questions = JSON.parse(localStorage.getItem("questions")) || [
+
+function buy(){
+usersData[currentUser.email].purchased = true
+localStorage.setItem("usersData", JSON.stringify(usersData))
+home()
+}
+
+// ================= QUESTIONS =================
+
+let questions = [
 {
 q:"Cell is unit of?",
 options:["Life","Energy","Plant","Atom"],
@@ -32,69 +41,44 @@ answer:0
 
 let current = 0
 let score = 0
+let wrong = 0
+let skipped = 0
+let answers = []
 let timer
 let timeLeft
-let attempt = 1
+
+// ================= HOME =================
 
 function home(){
+
+if(!isPurchased()){
 document.getElementById("content").innerHTML = `
 <div class="card">
 <h3>Biology Course</h3>
-${purchased ? "Purchased ✅" : "<button onclick='buy()'>Buy Course</button>"}
-</div>
-`
-}
-
-function buy(){
-purchased = true
-localStorage.setItem("purchased","true")
-home()
-}
-
-function practice(){
-if(!purchased){
-document.getElementById("content").innerHTML =
-`<div class="card">Buy course first</div>`
+<button onclick="buy()">Buy Course</button>
+</div>`
 return
 }
 
-document.getElementById("content").innerHTML =
-`
+document.getElementById("content").innerHTML = `
 <div class="card">
-<h3>Topic Wise</h3>
-<button onclick="startQuiz()">Cell Structure Quiz</button>
-</div>
-
-<div class="card">
-<h3>Chapter Wise</h3>
-<button onclick="startQuiz()">Chapter 1 Full Test</button>
-</div>
-`
+<h3>Course Dashboard</h3>
+<button onclick="practice()">Practice</button>
+<button onclick="profile()">Profile</button>
+</div>`
 }
 
-document.getElementById("content").innerHTML =
-`<div class="card">
+// ================= PRACTICE =================
+
+function practice(){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h3>Topic Wise</h3>
 <button onclick="startQuiz()">Start Quiz</button>
 </div>`
 }
 
-function profile(){
-
-let accuracyOverall = totalAttempts == 0 
-? 0 
-: ((totalCorrect/(totalAttempts*questions.length))*100)
-
-document.getElementById("content").innerHTML =
-`<div class="card">
-<h3>Profile</h3>
-<p>Total Attempts: ${totalAttempts}</p>
-<p>Overall Accuracy: ${accuracyOverall.toFixed(2)}%</p>
-</div>`
-}
-home()
-let skipped = 0
-let wrong = 0
-let answers = []
+// ================= QUIZ =================
 
 function startQuiz(){
 current = 0
@@ -102,24 +86,22 @@ score = 0
 wrong = 0
 skipped = 0
 answers = []
-attempt = 1
 showQuestion()
 }
 
 function showQuestion(){
+
 clearInterval(timer)
 
 let q = questions[current]
-timeLeft = attempt===1?60:attempt===2?50:40
+timeLeft = 30
 
 document.getElementById("content").innerHTML = `
 <div class="card">
 <h4>Question ${current+1}/${questions.length}</h4>
 <p>${q.q}</p>
 <div id="opts"></div>
-
 <p>Time: <span id="time">${timeLeft}</span>s</p>
-
 <button onclick="prevQuestion()">Previous</button>
 <button onclick="nextQuestion()">Next</button>
 <button onclick="submitQuiz()">Submit Quiz</button>
@@ -127,9 +109,10 @@ document.getElementById("content").innerHTML = `
 `
 
 let optDiv = document.getElementById("opts")
+
 q.options.forEach((o,i)=>{
 optDiv.innerHTML += `
-<div class="option">
+<div>
 <input type="radio" name="opt" value="${i}"> ${o}
 </div>`
 })
@@ -152,6 +135,7 @@ nextQuestion()
 }
 
 function nextQuestion(){
+
 clearInterval(timer)
 
 let selected = document.querySelector("input[name='opt']:checked")
@@ -178,7 +162,10 @@ showQuestion()
 }
 }
 
+// ================= RESULT =================
+
 function submitQuiz(){
+
 clearInterval(timer)
 
 score = 0
@@ -189,15 +176,27 @@ if(answers[i] === questions[i].answer){
 score++
 }else if(answers[i] !== -1){
 wrong++
-  totalAttempts++
-totalCorrect = parseInt(totalCorrect) + score
+}
+}
 
-localStorage.setItem("totalAttempts", totalAttempts)
-localStorage.setItem("totalCorrect", totalCorrect)
-}
-}
+// SAVE USER PROGRESS
+usersData[currentUser.email].attempts++
+usersData[currentUser.email].correct += score
+localStorage.setItem("usersData", JSON.stringify(usersData))
 
 let accuracy = (score/questions.length)*100
+
+// LEADERBOARD
+let board = []
+
+for(let email in usersData){
+board.push({
+email:email,
+score:usersData[email].correct
+})
+}
+
+board.sort((a,b)=>b.score-a.score)
 
 document.getElementById("content").innerHTML = `
 <div class="card">
@@ -207,21 +206,37 @@ document.getElementById("content").innerHTML = `
 <p>Wrong: ${wrong}</p>
 <p>Skipped: ${skipped}</p>
 <p>Accuracy: ${accuracy.toFixed(2)}%</p>
-let leaderboard = [
-{ name:"Topper", score:questions.length },
-{ name:"You", score:score }
-]
-
-leaderboard.sort((a,b)=>b.score-a.score)
-
-document.getElementById("content").innerHTML += `
-<div class="card">
-<h3>Leaderboard</h3>
-${leaderboard.map(l=>`<p>${l.name} - ${l.score}</p>`).join("")}
-</div>
-`
 <button onclick="startQuiz()">Reattempt</button>
 <button onclick="home()">Back Home</button>
 </div>
+
+<div class="card">
+<h3>Leaderboard</h3>
+${board.map((b,i)=>`<p>${i+1}. ${b.email} - ${b.score}</p>`).join("")}
+</div>
 `
 }
+
+// ================= PROFILE =================
+
+function profile(){
+
+let user = usersData[currentUser.email]
+
+let accuracy = user.attempts === 0 
+? 0 
+: (user.correct/(user.attempts*questions.length))*100
+
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h3>Profile</h3>
+<p>Email: ${currentUser.email}</p>
+<p>Total Attempts: ${user.attempts}</p>
+<p>Total Correct: ${user.correct}</p>
+<p>Accuracy: ${accuracy.toFixed(2)}%</p>
+<button onclick="home()">Back</button>
+</div>
+`
+}
+
+home()
